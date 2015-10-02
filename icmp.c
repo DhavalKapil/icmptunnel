@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+ #define MTU 1500
+
 // The socket fd
 int sockfd;
 
@@ -132,6 +134,47 @@ void send_packet(struct icmp_packet *packet_details)
   sendto(sockfd, packet, packet_size, 0, (struct sockaddr *)&servaddr, sizeof(struct sockaddr_in));
 
   free(packet);
+}
+
+void recvpacket(struct icmp_packet &packet_details)
+{
+  char *src_addr;
+  char *dest_addr;
+
+  struct iphdr *ip;
+  char *icmp_payload;
+
+  int packet_size;
+  char *packet;
+
+  struct sockaddr_in clntaddr, servaddr;
+
+  memset(&servaddr, 0, sizeof(struct sockaddr_in));
+  servaddr.sin_family = AF_INET;
+  servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+  if(bind(sockfd , (struct sockaddr *)&(servaddr) , sizeof(sockaddr_in)) == -1){
+    printf("Unable to bind\n");
+    exit(-1);
+  }
+
+  packet = (char *)malloc(MTU);
+  memset(packet, 0, MTU);
+
+  packet_size = recvfrom(sockfd , packet , MTU , 0, (struct sockaddr *)&(clntaddr) , &(sizeof(struct sockaddr *)));
+
+  if(packet_size > MTU){
+    printf("Packet needs to be fragmented\n");
+  }
+
+  ip = (struct iphdr *)packet;
+  icmp_payload = (char *)(packet + sizeof(struct iphdr) + sizeof(struct icmphdr));
+
+  packet_details->src_addr = ntoa(ip->saddr);
+  packet_details->dest_addr = ntoa(ip->daddr);
+  packet_details->payload = icmp_payload;
+  packet_details->payload_size = packet_size - sizeof(struct iphdr) - sizeof(struct icmphdr);
+
 }
 
 /**
