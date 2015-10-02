@@ -11,10 +11,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 
- #define MTU 1500
+/**
+ * Function to open_socket
+ */
+void open_socket()
+{
+  int on = 1;
 
-// The socket fd
-int sockfd;
+  sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
+
+  // Providing IP Headers
+  if (setsockopt(sockfd, IPPROTO_IP, IP_HDRINCL, (const char *)&on, sizeof(on)) == -1) {
+    printf("Unable to set IP_HDRINCL socket option\n");
+    exit(-1);
+  }
+}
 
 /**
  * Function to calculate checksum
@@ -44,137 +55,6 @@ uint16_t in_cksum(uint16_t *addr, int len)
   answer = ~sum;
 
   return answer;
-}
-
-/**
- * Function to open the socket
- */
-void open_socket()
-{
-  int on = 1;
-
-  sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
-
-  // Providing IP Headers
-  if (setsockopt(sockfd, IPPROTO_IP, IP_HDRINCL, (const char *)&on, sizeof(on)) == -1) {
-    printf("Unable to set IP_HDRINCL socket option\n");
-    exit(-1);
-  }
-}
-
-/**
- * Function to fill up common headers for IP and ICMP
- */
-void prepare_headers(struct iphdr *ip, struct icmphdr *icmp)
-{
-  ip->version = 4;
-  ip->ihl = 5;
-  ip->tos = 0;
-  ip->id = rand();
-  ip->frag_off = 0;
-  ip->ttl = 255;
-  ip->protocol = IPPROTO_ICMP;
-
-  icmp->type = ICMP_ECHO;
-  icmp->code = 0;
-  icmp->un.echo.sequence = rand();
-  icmp->un.echo.id = rand();
-  icmp->checksum = 0;   
-}
-
-/**
- * Function to send ICMP Packet
- */
-void send_packet(struct icmp_packet *packet_details)
-{
-  // Source and destination IPs
-  uint32_t src_addr;
-  uint32_t dest_addr;
-
-  struct iphdr *ip;
-  struct icmphdr *icmp;
-  char *icmp_payload;
-
-  int packet_size;
-  char *packet;
-
-  struct sockaddr_in servaddr;
-
-  src_addr = inet_addr(packet_details->src_addr);
-  dest_addr = inet_addr(packet_details->dest_addr);
-
-  packet_size = sizeof(struct iphdr) + sizeof(struct icmphdr) + packet_details->payload_size;
-  packet = (char *)malloc(packet_size);
-  if (packet == NULL) {
-    printf("No memory available\n");
-    close_socket();
-    exit(-1);
-  }
-  memset(packet, 0, packet_size);
-
-  ip = (struct iphdr *)packet;
-  icmp = (struct icmphdr *)(packet + sizeof(struct iphdr));
-  icmp_payload = (char *)(packet + sizeof(struct iphdr) + sizeof(struct icmphdr));
-
-  prepare_headers(ip, icmp);
-
-  ip->tot_len = htons(packet_size);
-  ip->saddr = src_addr;
-  ip->daddr = dest_addr;
-
-  memset(&servaddr, 0, sizeof(struct sockaddr_in));
-  servaddr.sin_family = AF_INET;
-  servaddr.sin_addr.s_addr = dest_addr;
-  
-  memcpy(icmp_payload, packet_details->payload, packet_details->payload_size);
-
-  icmp->checksum = 0;
-  icmp->checksum = in_cksum((unsigned short *)icmp, sizeof(struct icmphdr) + packet_details->payload_size);
-
-  sendto(sockfd, packet, packet_size, 0, (struct sockaddr *)&servaddr, sizeof(struct sockaddr_in));
-
-  free(packet);
-}
-
-void recvpacket(struct icmp_packet &packet_details)
-{
-  char *src_addr;
-  char *dest_addr;
-
-  struct iphdr *ip;
-  char *icmp_payload;
-
-  int packet_size;
-  char *packet;
-
-  struct sockaddr_in clntaddr, servaddr;
-
-  memset(&servaddr, 0, sizeof(struct sockaddr_in));
-  servaddr.sin_family = AF_INET;
-  servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-  if(bind(sockfd , (struct sockaddr *)&(servaddr) , sizeof(sockaddr_in)) == -1){
-    printf("Unable to bind\n");
-    exit(-1);
-  }
-
-  packet = (char *)malloc(MTU);
-  memset(packet, 0, MTU);
-
-  packet_size = recvfrom(sockfd , packet , MTU , 0, (struct sockaddr *)&(clntaddr) , &(sizeof(struct sockaddr *)));
-
-  if(packet_size > MTU){
-    printf("Packet needs to be fragmented\n");
-  }
-
-  ip = (struct iphdr *)packet;
-  icmp_payload = (char *)(packet + sizeof(struct iphdr) + sizeof(struct icmphdr));
-
-  packet_details->src_addr = ntoa(ip->saddr);
-  packet_details->dest_addr = ntoa(ip->daddr);
-  packet_details->payload = icmp_payload;
-  packet_details->payload_size = packet_size - sizeof(struct iphdr) - sizeof(struct icmphdr);
-
 }
 
 /**

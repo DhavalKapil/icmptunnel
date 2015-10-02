@@ -7,6 +7,9 @@
 #ifndef icmp_gaurd
 #define icmp_gaurd
 
+// Maximum transmission unit
+#define MTU 1500
+
 struct icmp_packet
 {
   char *src_addr;
@@ -15,24 +18,22 @@ struct icmp_packet
   int payload_size;
 };
 
+// The socket fd
+int sockfd;
+
 /**
  * Function to calculate checksum
  */
 uint16_t in_cksum(uint16_t *addr, int len);
 
 /**
- * Function to open the socket
+ * Function to open socket
  */
 void open_socket();
 
 /**
- * Function to close the socket
+ * Function to close socket
  */
 void close_socket();
-
-/**
- * Function to send ICMP Packet
- */
-void send_packet(struct icmp_packet *packet_details);
 
 #endif

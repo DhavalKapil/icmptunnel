@@ -10,7 +10,7 @@ int main()
 	packet.payload = "ZZZZZZ";
 	packet.payload_size = strlen(packet.payload);
 
-	open_socket();
+	initialize_client();
 
 	send_packet(&packet);
 
