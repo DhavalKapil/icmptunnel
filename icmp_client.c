@@ -3,8 +3,10 @@
  */
 
 #include "icmp_client.h"
+#include <errno.h>
 #include <stdint.h>
 #include <string.h>
+#include <arpa/inet.h>
 #include <netinet/ip.h>
 #include <netinet/ip_icmp.h>
 #include <unistd.h>
@@ -45,8 +47,8 @@ void prepare_headers(struct iphdr *ip, struct icmphdr *icmp)
 void send_packet(struct icmp_packet *packet_details)
 {
   // Source and destination IPs
-  uint32_t src_addr;
-  uint32_t dest_addr;
+  struct in_addr src_addr;
+  struct in_addr dest_addr;
 
   struct iphdr *ip;
   struct icmphdr *icmp;
@@ -57,8 +59,8 @@ void send_packet(struct icmp_packet *packet_details)
 
   struct sockaddr_in servaddr;
 
-  src_addr = inet_addr(packet_details->src_addr);
-  dest_addr = inet_addr(packet_details->dest_addr);
+  inet_pton(AF_INET, packet_details->src_addr, &src_addr);
+  inet_pton(AF_INET, packet_details->dest_addr, &dest_addr);
 
   packet_size = sizeof(struct iphdr) + sizeof(struct icmphdr) + packet_details->payload_size;
   packet = (char *)malloc(packet_size);
@@ -76,17 +78,17 @@ void send_packet(struct icmp_packet *packet_details)
   prepare_headers(ip, icmp);
 
   ip->tot_len = htons(packet_size);
-  ip->saddr = src_addr;
-  ip->daddr = dest_addr;
+  ip->saddr = src_addr.s_addr;
+  ip->daddr = dest_addr.s_addr;
 
-  memset(&servaddr, 0, sizeof(struct sockaddr_in));
-  servaddr.sin_family = AF_INET;
-  servaddr.sin_addr.s_addr = dest_addr;
-  
   memcpy(icmp_payload, packet_details->payload, packet_details->payload_size);
 
   icmp->checksum = 0;
   icmp->checksum = in_cksum((unsigned short *)icmp, sizeof(struct icmphdr) + packet_details->payload_size);
+
+  memset(&servaddr, 0, sizeof(struct sockaddr_in));
+  servaddr.sin_family = AF_INET;
+  servaddr.sin_addr.s_addr = dest_addr.s_addr;
 
   sendto(sockfd, packet, packet_size, 0, (struct sockaddr *)&servaddr, sizeof(struct sockaddr_in));
 

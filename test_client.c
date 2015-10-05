@@ -3,16 +3,21 @@
 
 int main()
 {
-	struct icmp_packet packet;
+  struct icmp_packet packet;
+  char *src_ip;
+  char *dest_ip;
 
-	packet.src_addr = "127.0.0.1";
-	packet.dest_addr = "127.0.0.1";
-	packet.payload = "ZZZZZZ";
-	packet.payload_size = strlen(packet.payload);
+  src_ip = "127.0.0.2";
+  dest_ip = "127.0.0.1";
 
-	initialize_client();
+  strcpy(packet.src_addr, src_ip);
+  strcpy(packet.dest_addr, dest_ip);
+  packet.payload = "ZZZZZZ";
+  packet.payload_size = strlen(packet.payload);
 
-	send_packet(&packet);
+  initialize_client();
 
-	close_socket();
+  send_packet(&packet);
+
+  close_socket();
 }

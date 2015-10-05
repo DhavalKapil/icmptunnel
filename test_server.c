@@ -5,15 +5,14 @@
 
 int main()
 {
-	struct icmp_packet packet;
+  struct icmp_packet packet;
 
-	initialize_server();
-	printf("server initialized\n");
+  initialize_server();
+  printf("server initialized\n");
 
-	receive_packet(&packet);
-	printf("packet received\n");
+  receive_packet(&packet);
+  printf("packet received\n");
+  printf("%s : %s : %s : %d\n",packet.src_addr, packet.dest_addr, packet.payload , packet.payload_size);
 
-	printf("%s : %s : %s : %d\n",packet.src_addr, packet.dest_addr, packet.payload , packet.payload_size);
-
-	close_socket();
+  close_socket();
 }

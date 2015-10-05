@@ -12,8 +12,8 @@
 
 struct icmp_packet
 {
-  char *src_addr;
-  char *dest_addr;
+  char src_addr[100];
+  char dest_addr[100];
   char *payload;
   int payload_size;
 };
