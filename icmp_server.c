@@ -51,9 +51,14 @@ void receive_packet(struct icmp_packet *packet_details)
   memset(packet, 0, MTU);
 
   clntaddr_size = sizeof(struct sockaddr_in);
+  
+  while(1){
   packet_size = recvfrom(sockfd, packet, MTU, 0, (struct sockaddr *)&(clntaddr), &clntaddr_size);
-
   ip = (struct iphdr *)packet;
+  if(ip->protocol == IPPROTO_ICMP)
+    break;
+  }
+
   icmp_payload = (char *)(packet + sizeof(struct iphdr) + sizeof(struct icmphdr));
 
   packet_details->src_addr = inet_ntoa(ip->saddr);

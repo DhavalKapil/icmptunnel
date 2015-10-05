@@ -18,7 +18,7 @@ void open_socket()
 {
   int on = 1;
 
-  sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
+  sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
 
   // Providing IP Headers
   if (setsockopt(sockfd, IPPROTO_IP, IP_HDRINCL, (const char *)&on, sizeof(on)) == -1) {
