@@ -1,23 +1,20 @@
-#include "icmp_client.h"
+#include "file.h"
 #include <string.h>
 
 int main()
 {
-  struct icmp_packet packet;
-  char *src_ip;
-  char *dest_ip;
-
-  src_ip = "127.0.0.2";
-  dest_ip = "127.0.0.1";
-
-  strcpy(packet.src_addr, src_ip);
-  strcpy(packet.dest_addr, dest_ip);
-  packet.payload = "ZZZZZZ";
-  packet.payload_size = strlen(packet.payload);
-
+  char *filename, *src_ip, *dest_ip;
+  
   initialize_client();
 
-  send_packet(&packet);
+  //send_packet(&packet);
+  filename = (char *)malloc(100);
+  src_ip = (char *)malloc(100);
+  dest_ip = (char *)malloc(100);
+  filename = "/home/abhijeet/Desktop/network/gitrepo/ICMP-Tunneling/send";
+  src_ip = "127.0.0.1";
+  dest_ip = "127.0.0.1";
+  send_file(filename,src_ip,dest_ip);
 
   close_socket();
 }
