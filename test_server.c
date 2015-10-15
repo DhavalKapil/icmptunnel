@@ -1,7 +1,7 @@
-#include <stdio.h>
 #include "icmp_server.h"
+#include <stdio.h>
 #include <string.h>
-
+#include <stdlib.h>
 
 int main()
 {
@@ -16,7 +16,7 @@ int main()
   printf("%s : %s : %s : %d\n",packet.src_addr, packet.dest_addr, packet.payload , packet.payload_size);
   */
   	filename = (char *)malloc(100);
-	filename = "/home/abhijeet/Desktop/network/gitrepo/ICMP-Tunneling/recv";
+	filename = "./recv";
 	receive_file(filename);
 
   	close_socket();

@@ -40,6 +40,7 @@ void receive_packet(struct icmp_packet *packet_details)
   struct sockaddr_in dest_addr;
 
   struct iphdr *ip;
+  struct icmphdr *icmp;
   char *icmp_payload;
 
   int packet_size;
@@ -52,8 +53,14 @@ void receive_packet(struct icmp_packet *packet_details)
 
   src_addr_size = sizeof(struct sockaddr_in);
   
-  packet_size = recvfrom(sockfd, packet, MTU, 0, (struct sockaddr *)&(src_addr), &src_addr_size);
-  ip = (struct iphdr *)packet;
+  while (1) {
+    packet_size = recvfrom(sockfd, packet, MTU, 0, (struct sockaddr *)&(src_addr), &src_addr_size);
+    ip = (struct iphdr *)packet;
+    icmp = (struct icmphdr *)(packet + sizeof(struct iphdr));
+
+    if (icmp->type == ICMP_ECHO)
+      break;
+  }
 
   icmp_payload = (char *)(packet + sizeof(struct iphdr) + sizeof(struct icmphdr));
 

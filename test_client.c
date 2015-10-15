@@ -11,7 +11,7 @@ int main()
   filename = (char *)malloc(100);
   src_ip = (char *)malloc(100);
   dest_ip = (char *)malloc(100);
-  filename = "/home/abhijeet/Desktop/network/gitrepo/ICMP-Tunneling/send";
+  filename = "./send";
   src_ip = "127.0.0.1";
   dest_ip = "127.0.0.1";
   send_file(filename,src_ip,dest_ip);
