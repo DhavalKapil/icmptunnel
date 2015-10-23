@@ -28,6 +28,11 @@ int sockfd;
 void set_echo_type(struct icmp_packet *packet);
 
 /**
+ * Function to set packet type as REPLY
+ */
+void set_reply_type(struct icmp_packet *packet);
+
+/**
  * Function to open a socket for icmp
  */
 void open_icmp_socket();
