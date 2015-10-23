@@ -14,12 +14,18 @@ struct icmp_packet
 {
   char src_addr[100];
   char dest_addr[100];
+  int type;
   char *payload;
   int payload_size;
 };
 
 // The socket fd
 int sockfd;
+
+/**
+ * Function to set packet type as ECHO
+ */
+void set_echo_type(struct icmp_packet *packet);
 
 /**
  * Function to open a socket for icmp

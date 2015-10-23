@@ -22,6 +22,22 @@ uint16_t in_cksum(uint16_t *addr, int len);
 void prepare_headers(struct iphdr *ip, struct icmphdr *icmp);
 
 /**
+ * Function to set packet type as ECHO
+ */
+void set_echo_type(struct icmp_packet *packet)
+{
+  packet->type = ICMP_ECHO;
+}
+
+/**
+ * Function to set packet type as REPLY
+ */
+void set_reply_type(struct icmp_packet *packet)
+{
+  packet->type = ICMP_ECHOREPLY;
+}
+
+/**
  * Function to open a socket for icmp
  */
 void open_icmp_socket()
@@ -96,6 +112,7 @@ void send_icmp_packet(struct icmp_packet *packet_details)
 
   memcpy(icmp_payload, packet_details->payload, packet_details->payload_size);
 
+  icmp->type = packet_details->type;
   icmp->checksum = 0;
   icmp->checksum = in_cksum((unsigned short *)icmp, sizeof(struct icmphdr) + packet_details->payload_size);
 
@@ -117,6 +134,7 @@ void receive_icmp_packet(struct icmp_packet *packet_details)
   struct sockaddr_in dest_addr;
 
   struct iphdr *ip;
+  struct icmphdr *icmp;
   char *icmp_payload;
 
   int packet_size;
@@ -130,15 +148,19 @@ void receive_icmp_packet(struct icmp_packet *packet_details)
   src_addr_size = sizeof(struct sockaddr_in);
   
   packet_size = recvfrom(sockfd, packet, MTU, 0, (struct sockaddr *)&(src_addr), &src_addr_size);
-  ip = (struct iphdr *)packet;
 
+  ip = (struct iphdr *)packet;
+  icmp = (struct icmphdr *)(packet + sizeof(struct iphdr));
   icmp_payload = (char *)(packet + sizeof(struct iphdr) + sizeof(struct icmphdr));
 
   inet_ntop(AF_INET, &(ip->saddr), packet_details->src_addr, INET_ADDRSTRLEN);
   inet_ntop(AF_INET, &(ip->daddr), packet_details->dest_addr, INET_ADDRSTRLEN);
-  packet_details->payload = icmp_payload;
+  packet_details->type = icmp->type;
   packet_details->payload_size = packet_size - sizeof(struct iphdr) - sizeof(struct icmphdr);
+  packet_details->payload = (char *)malloc(packet_details->payload_size);
+  memcpy(packet_details->payload, icmp_payload, packet_details->payload_size);
 
+  free(packet);
 }
 
 /**
@@ -192,7 +214,6 @@ void prepare_headers(struct iphdr *ip, struct icmphdr *icmp)
   ip->ttl = 255;
   ip->protocol = IPPROTO_ICMP;
 
-  icmp->type = ICMP_ECHO;
   icmp->code = 0;
   icmp->un.echo.sequence = rand();
   icmp->un.echo.id = rand();

@@ -12,6 +12,7 @@ int main()
 
   strcpy(packet.src_addr, src_ip);
   strcpy(packet.dest_addr, dest_ip);
+  set_reply_type(&packet);
   packet.payload = "ZZZZZZ";
   packet.payload_size = strlen(packet.payload);
 

@@ -15,6 +15,9 @@ int main()
   while(1)
   {
     receive_icmp_packet(&packet);
+    printf("%s\n", packet.src_addr);
+    printf("%s\n", packet.dest_addr);
+    printf("%d\n", packet.type);
     printf("%s\n", packet.payload);
   }
  
