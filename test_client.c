@@ -1,4 +1,4 @@
-#include "icmp_client.h"
+#include "icmp.h"
 #include <string.h>
 
 int main()
@@ -15,9 +15,9 @@ int main()
   packet.payload = "ZZZZZZ";
   packet.payload_size = strlen(packet.payload);
 
-  initialize_client();
+  open_icmp_socket();
 
-  send_packet(&packet);
+  send_icmp_packet(&packet);
 
-  close_socket();
+  close_icmp_socket();
 }

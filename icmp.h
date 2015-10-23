@@ -22,18 +22,28 @@ struct icmp_packet
 int sockfd;
 
 /**
- * Function to calculate checksum
+ * Function to open a socket for icmp
  */
-uint16_t in_cksum(uint16_t *addr, int len);
+void open_icmp_socket();
 
 /**
- * Function to open socket
+ * Function to bind the socket to INADDR_ANY
  */
-void open_socket();
+void bind_icmp_socket();
 
 /**
- * Function to close socket
+ * Function to send ICMP Packet
  */
-void close_socket();
+void send_icmp_packet(struct icmp_packet *packet_details);
+
+/**
+ * Function to receive ICMP Packet
+ */
+void receive_icmp_packet(struct icmp_packet *packet_details);
+
+/**
+ * Function to close the icmp socket
+ */
+void close_icmp_socket();
 
 #endif

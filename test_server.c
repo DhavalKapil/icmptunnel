@@ -1,18 +1,22 @@
+#include "icmp.h"
+
 #include <stdio.h>
-#include "icmp_server.h"
 #include <string.h>
-
-
+ 
+ 
 int main()
 {
   struct icmp_packet packet;
+ 
+  open_icmp_socket();
+  bind_icmp_socket();
 
-  initialize_server();
   printf("server initialized\n");
-
-  receive_packet(&packet);
-  printf("packet received\n");
-  printf("%s : %s : %s : %d\n",packet.src_addr, packet.dest_addr, packet.payload , packet.payload_size);
-
-  close_socket();
+  while(1)
+  {
+    receive_icmp_packet(&packet);
+    printf("%s\n", packet.payload);
+  }
+ 
+  close_icmp_socket();
 }
