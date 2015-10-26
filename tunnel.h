@@ -29,6 +29,6 @@ int tun_alloc(char *dev, int flags);
 /**
  * Function to run the tunnel
  */
-void run_tunnel(int tun_fd, char *dest, int server);
+void run_tunnel(char *dest, int server);
 
 #endif
