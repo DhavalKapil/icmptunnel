@@ -107,6 +107,7 @@ void run_tunnel(char *dest, int server)
       // Preparing ICMP packet to be sent
       memset(&packet, 0, sizeof(struct icmp_packet));
       printf("[DEBUG] Destination address: %s\n", dest);
+      strcpy(packet.src_addr, "0.0.0.0");
       strcpy(packet.dest_addr, dest);
       if(server) {
         set_reply_type(&packet);
