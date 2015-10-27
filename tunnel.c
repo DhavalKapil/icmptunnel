@@ -59,7 +59,7 @@ int tun_alloc(char *dev, int flags)
 int tun_read(int tun_fd, char *buffer, int length)
 {
   printf("[DEBUG] Reading from tunnel\n");
-  return write(tun_fd, buffer, length);
+  return read(tun_fd, buffer, length);
 }
 
 /**
@@ -68,7 +68,7 @@ int tun_read(int tun_fd, char *buffer, int length)
 int tun_write(int tun_fd, char *buffer, int length)
 {
   printf("[DEBUG] Writing to tunnel\n");
-  return read(tun_fd, buffer, length);
+  return write(tun_fd, buffer, length);
 }
 
 /**
@@ -81,7 +81,7 @@ void run_tunnel(char *dest, int server)
 
   fd_set fs;
 
-  tun_fd = tun_alloc("tun0", IFF_TUN);
+  tun_fd = tun_alloc("tun0", IFF_TUN | IFF_NO_PI);
 
   printf("[DEBUG] Starting tunnel - Dest: %s, Server: %d\n", dest, server);
   printf("[DEBUG] Opening ICMP socket\n");
@@ -140,11 +140,8 @@ void run_tunnel(char *dest, int server)
       // Writing out to tun device
       tun_write(tun_fd, packet.payload, packet.payload_size);
 
-      if (dest == NULL) {
-        dest = malloc(100);
-        printf("[DEBUG] Src address being copied: %s\n", packet.src_addr);
-        strcpy(dest, packet.src_addr);
-      }
+      printf("[DEBUG] Src address being copied: %s\n", packet.src_addr);
+      strcpy(dest, packet.src_addr);
     }
   }
 
