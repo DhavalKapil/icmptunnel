@@ -46,11 +46,11 @@ int open_icmp_socket()
 
   sock_fd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
 
-  if (sock_fd == -1)
-  {
+  if (sock_fd == -1) {
     perror("Unable to open ICMP socket\n");
     exit(-1);
   }
+  
   // Providing IP Headers
   if (setsockopt(sock_fd, IPPROTO_IP, IP_HDRINCL, (const char *)&on, sizeof(on)) == -1) {
     printf("Unable to set IP_HDRINCL socket option\n");

@@ -32,11 +32,11 @@ int tun_alloc(char *dev, int flags)
 
   tun_fd = open(clonedev, O_RDWR);
 
-  if(tun_fd == -1)
-  {
+  if(tun_fd == -1) {
     perror("Unable to open clone device\n");
     exit(-1);
   }
+  
   memset(&ifr, 0, sizeof(ifr));
 
   ifr.ifr_flags = flags;
