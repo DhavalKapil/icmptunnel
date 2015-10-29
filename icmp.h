@@ -19,9 +19,6 @@ struct icmp_packet
   int payload_size;
 };
 
-// The socket fd
-int sockfd;
-
 /**
  * Function to set packet type as ECHO
  */
@@ -35,26 +32,26 @@ void set_reply_type(struct icmp_packet *packet);
 /**
  * Function to open a socket for icmp
  */
-void open_icmp_socket();
+int open_icmp_socket();
 
 /**
  * Function to bind the socket to INADDR_ANY
  */
-void bind_icmp_socket();
+void bind_icmp_socket(int sock_fd);
 
 /**
  * Function to send ICMP Packet
  */
-void send_icmp_packet(struct icmp_packet *packet_details);
+void send_icmp_packet(int sock_fd, struct icmp_packet *packet_details);
 
 /**
  * Function to receive ICMP Packet
  */
-void receive_icmp_packet(struct icmp_packet *packet_details);
+void receive_icmp_packet(int sock_fd, struct icmp_packet *packet_details);
 
 /**
  * Function to close the icmp socket
  */
-void close_icmp_socket();
+void close_icmp_socket(int sock_fd);
 
 #endif

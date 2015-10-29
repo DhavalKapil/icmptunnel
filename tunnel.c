@@ -77,7 +77,7 @@ int tun_write(int tun_fd, char *buffer, int length)
 void run_tunnel(char *dest, int server)
 {
   struct icmp_packet packet;
-  int tun_fd;
+  int tun_fd, sock_fd;
 
   fd_set fs;
 
@@ -85,19 +85,19 @@ void run_tunnel(char *dest, int server)
 
   printf("[DEBUG] Starting tunnel - Dest: %s, Server: %d\n", dest, server);
   printf("[DEBUG] Opening ICMP socket\n");
-  open_icmp_socket();
+  sock_fd = open_icmp_socket();
 
   if (server) {
     printf("[DEBUG] Binding ICMP socket\n");
-    bind_icmp_socket();
+    bind_icmp_socket(sock_fd);
   }
 
   while (1) {
     FD_ZERO(&fs);
     FD_SET(tun_fd, &fs);
-    FD_SET(sockfd, &fs);
+    FD_SET(sock_fd, &fs);
 
-    select(tun_fd>sockfd?tun_fd+1:sockfd+1, &fs, NULL, NULL, NULL);
+    select(tun_fd>sock_fd?tun_fd+1:sock_fd+1, &fs, NULL, NULL, NULL);
 
     if (FD_ISSET(tun_fd, &fs)) {
       printf("[DEBUG] Data needs to be readed from tun device\n");
@@ -124,18 +124,18 @@ void run_tunnel(char *dest, int server)
 
       printf("[DEBUG] Sending ICMP packet with payload_size: %d, payload: %s\n", packet.payload_size, packet.payload);
       // Sending ICMP packet
-      send_icmp_packet(&packet);
+      send_icmp_packet(sock_fd, &packet);
 
       free(packet.payload);
     }
 
-    if (FD_ISSET(sockfd, &fs)) {
+    if (FD_ISSET(sock_fd, &fs)) {
       printf("[DEBUG] Received ICMP packet\n");
       // Reading data from remote socket and sending to tun device
 
       // Getting ICMP packet
       memset(&packet, 0, sizeof(struct icmp_packet));
-      receive_icmp_packet(&packet);
+      receive_icmp_packet(sock_fd, &packet);
 
       printf("[DEBUG] Read ICMP packet with src: %s, dest: %s, payload_size: %d, payload: %s\n", packet.src_addr, packet.dest_addr, packet.payload_size, packet.payload);
       // Writing out to tun device

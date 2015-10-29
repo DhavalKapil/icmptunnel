@@ -40,23 +40,25 @@ void set_reply_type(struct icmp_packet *packet)
 /**
  * Function to open a socket for icmp
  */
-void open_icmp_socket()
+int open_icmp_socket()
 {
-  int on = 1;
+  int sock_fd, on = 1;
 
-  sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
+  sock_fd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
 
   // Providing IP Headers
-  if (setsockopt(sockfd, IPPROTO_IP, IP_HDRINCL, (const char *)&on, sizeof(on)) == -1) {
+  if (setsockopt(sock_fd, IPPROTO_IP, IP_HDRINCL, (const char *)&on, sizeof(on)) == -1) {
     printf("Unable to set IP_HDRINCL socket option\n");
     exit(-1);
   }
+
+  return sock_fd;
 }
 
 /**
  * Function to bind the socket to INADDR_ANY
  */
-void bind_icmp_socket()
+void bind_icmp_socket(int sock_fd)
 {
   struct sockaddr_in servaddr;
 
@@ -64,7 +66,7 @@ void bind_icmp_socket()
   servaddr.sin_family = AF_INET;
   servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-  if (bind(sockfd, (struct sockaddr *)&servaddr, sizeof(struct sockaddr_in)) == -1){
+  if (bind(sock_fd, (struct sockaddr *)&servaddr, sizeof(struct sockaddr_in)) == -1){
     printf("Unable to bind\n");
     exit(-1);
   }
@@ -73,7 +75,7 @@ void bind_icmp_socket()
 /**
  * Function to send ICMP Packet
  */
-void send_icmp_packet(struct icmp_packet *packet_details)
+void send_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
 {
   // Source and destination IPs
   struct in_addr src_addr;
@@ -95,7 +97,7 @@ void send_icmp_packet(struct icmp_packet *packet_details)
   packet = (char *)malloc(packet_size);
   if (packet == NULL) {
     printf("No memory available\n");
-    close_icmp_socket();
+    close_icmp_socket(sock_fd);
     exit(-1);
   }
   memset(packet, 0, packet_size);
@@ -120,7 +122,7 @@ void send_icmp_packet(struct icmp_packet *packet_details)
   servaddr.sin_family = AF_INET;
   servaddr.sin_addr.s_addr = dest_addr.s_addr;
 
-  sendto(sockfd, packet, packet_size, 0, (struct sockaddr *)&servaddr, sizeof(struct sockaddr_in));
+  sendto(sock_fd, packet, packet_size, 0, (struct sockaddr *)&servaddr, sizeof(struct sockaddr_in));
 
   free(packet);
 }
@@ -128,7 +130,7 @@ void send_icmp_packet(struct icmp_packet *packet_details)
 /**
  * Function to receive an ICMP packet
  */
-void receive_icmp_packet(struct icmp_packet *packet_details)
+void receive_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
 {
   struct sockaddr_in src_addr;
   struct sockaddr_in dest_addr;
@@ -147,7 +149,7 @@ void receive_icmp_packet(struct icmp_packet *packet_details)
 
   src_addr_size = sizeof(struct sockaddr_in);
   
-  packet_size = recvfrom(sockfd, packet, MTU, 0, (struct sockaddr *)&(src_addr), &src_addr_size);
+  packet_size = recvfrom(sock_fd, packet, MTU, 0, (struct sockaddr *)&(src_addr), &src_addr_size);
 
   ip = (struct iphdr *)packet;
   icmp = (struct icmphdr *)(packet + sizeof(struct iphdr));
@@ -166,9 +168,9 @@ void receive_icmp_packet(struct icmp_packet *packet_details)
 /**
  * Function to close the icmp socket
  */
-void close_icmp_socket()
+void close_icmp_socket(int sock_fd)
 {
-  close(sockfd);
+  close(sock_fd);
 }
 
 /**
