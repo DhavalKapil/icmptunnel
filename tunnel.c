@@ -72,6 +72,43 @@ int tun_write(int tun_fd, char *buffer, int length)
 }
 
 /**
+ * Function to configure the network
+ */
+void configure_network(int server)
+{
+  int pid, status;
+  char path[100];
+  char *const args[] = {path, NULL};
+
+  if (server) {
+    strcpy(path, SERVER_SCRIPT);
+  }
+  else {
+    strcpy(path, CLIENT_SCRIPT);
+  }
+
+  pid = fork();
+
+  if (pid==0) {
+    // Child process, run the script
+    exit(execv(path, args));
+  }
+  else {
+    // Parent process
+    waitpid(pid, &status, 0);
+    if (WEXITSTATUS(status) == 0) {
+      // Script executed correctly
+      printf("[DEBUG] Script ran successfully\n");
+    }
+    else {
+      // Some error
+      printf("[DEBUG] Error in running script\n");
+    }
+  }
+}
+
+
+/**
  * Function to run the tunnel
  */
 void run_tunnel(char *dest, int server)
@@ -91,6 +128,8 @@ void run_tunnel(char *dest, int server)
     printf("[DEBUG] Binding ICMP socket\n");
     bind_icmp_socket(sock_fd);
   }
+
+  configure_network(server);
 
   while (1) {
     FD_ZERO(&fs);
