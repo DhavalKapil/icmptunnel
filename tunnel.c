@@ -32,6 +32,11 @@ int tun_alloc(char *dev, int flags)
 
   tun_fd = open(clonedev, O_RDWR);
 
+  if(tun_fd == -1)
+  {
+    perror("Unable to open clone device\n");
+    exit(-1);
+  }
   memset(&ifr, 0, sizeof(ifr));
 
   ifr.ifr_flags = flags;
@@ -58,8 +63,17 @@ int tun_alloc(char *dev, int flags)
  */
 int tun_read(int tun_fd, char *buffer, int length)
 {
+  int bytes_read;
   printf("[DEBUG] Reading from tunnel\n");
-  return read(tun_fd, buffer, length);
+  bytes_read = read(tun_fd, buffer, length);
+
+  if (bytes_read == -1) {
+    perror("Unable to read from tunnel\n");
+    exit(-1);
+  }
+  else {
+    return bytes_read;
+  }
 }
 
 /**
@@ -67,8 +81,17 @@ int tun_read(int tun_fd, char *buffer, int length)
  */
 int tun_write(int tun_fd, char *buffer, int length)
 {
+  int bytes_written;
   printf("[DEBUG] Writing to tunnel\n");
-  return write(tun_fd, buffer, length);
+  bytes_written = write(tun_fd, buffer, length);
+
+  if (bytes_written == -1) {
+    perror("Unable to write to tunnel\n");
+    exit(-1);
+  }
+  else {
+    return bytes_written;
+  }
 }
 
 /**
@@ -89,6 +112,11 @@ void configure_network(int server)
 
   pid = fork();
 
+  if (pid == -1) {
+    perror("Unable to fork\n");
+    exit(-1);
+  }
+  
   if (pid==0) {
     // Child process, run the script
     exit(execv(path, args));
