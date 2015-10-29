@@ -47,7 +47,7 @@ int tun_alloc(char *dev, int flags)
   }
 
   printf("[DEBUG] Allocatating tunnel2");
-  //strcpy(dev, ifr.ifr_name);
+
   printf("[DEBUG] Created tunnel %s\n", dev);
 
   return tun_fd;

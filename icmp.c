@@ -62,11 +62,13 @@ void bind_icmp_socket(int sock_fd)
 {
   struct sockaddr_in servaddr;
 
+  // Initializing servaddr to bind to all interfaces
   memset(&servaddr, 0, sizeof(struct sockaddr_in));
   servaddr.sin_family = AF_INET;
   servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-  if (bind(sock_fd, (struct sockaddr *)&servaddr, sizeof(struct sockaddr_in)) == -1){
+  // binding the socket
+  if (bind(sock_fd, (struct sockaddr *)&servaddr, sizeof(struct sockaddr_in)) == -1) {
     printf("Unable to bind\n");
     exit(-1);
   }
@@ -102,6 +104,7 @@ void send_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
   }
   memset(packet, 0, packet_size);
 
+  // Initializing header and payload pointers
   ip = (struct iphdr *)packet;
   icmp = (struct icmphdr *)(packet + sizeof(struct iphdr));
   icmp_payload = (char *)(packet + sizeof(struct iphdr) + sizeof(struct icmphdr));
@@ -122,6 +125,7 @@ void send_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
   servaddr.sin_family = AF_INET;
   servaddr.sin_addr.s_addr = dest_addr.s_addr;
 
+  // Sending the packet
   sendto(sock_fd, packet, packet_size, 0, (struct sockaddr *)&servaddr, sizeof(struct sockaddr_in));
 
   free(packet);
@@ -149,12 +153,14 @@ void receive_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
 
   src_addr_size = sizeof(struct sockaddr_in);
   
+  // Receiving packet
   packet_size = recvfrom(sock_fd, packet, MTU, 0, (struct sockaddr *)&(src_addr), &src_addr_size);
 
   ip = (struct iphdr *)packet;
   icmp = (struct icmphdr *)(packet + sizeof(struct iphdr));
   icmp_payload = (char *)(packet + sizeof(struct iphdr) + sizeof(struct icmphdr));
 
+  // Filling up packet_details
   inet_ntop(AF_INET, &(ip->saddr), packet_details->src_addr, INET_ADDRSTRLEN);
   inet_ntop(AF_INET, &(ip->daddr), packet_details->dest_addr, INET_ADDRSTRLEN);
   packet_details->type = icmp->type;
