@@ -1,6 +1,6 @@
 # icmptunnel
 
-> Tunnel your IP traffic through ICMP echo and reply packets.
+> Transparently tunnel your IP traffic through ICMP echo and reply packets.
 
 'icmptunnel' works by encapsulating your IP traffic in ICMP echo packets and sending them to your own proxy server. The proxy server decapsulates the packet and forwards the IP traffic. The incoming IP packets which are destined for the client are again encapsulated in ICMP reply packets and sent back to the client. The IP traffic is sent in the 'data' field of ICMP packets.
 
@@ -91,22 +91,22 @@ On the client side, the IP packet is retrieved from the payload of the ICMP repl
 
 ```
 +--------------+                                    +------------+
-|              |  IP traffic  +------+  IP traffic  |            |    ICMP traffic
-|     User     |  --------->  | tun0 |  --------->  | icmptunnel | ------------------>
-| Applications |  <---------  +------+  <---------  |  program   | <------------------
-|              |        (Virtual Interface)         |            | restricted internet
-+--------------+                                    +------------+
+|              |  IP traffic  +------+  IP traffic  |            |   ICMP traffic
+|     User     |  --------->  | tun0 |  --------->  | icmptunnel | --------------->
+| Applications |  <---------  +------+  <---------  |  program   | <---------------
+|              |        (Virtual Interface)         |            |    restricted 
++--------------+                                    +------------+     internet
 ```
 
 #### Proxy Server Architecture:
 
 ```
-                    +------------+
-    ICMP traffic    |            |  IP traffic     +------+       NAT/Masquerading
-------------------> | icmptunnel | ------------>   | tun0 |    ---------------------> 
-<------------------ |  program   | <------------   +------+    <---------------------
-restricted internet |            |           (Virtual Interface)   proper internet
-                    +------------+
+                 +------------+
+  ICMP traffic   |            |  IP traffic     +------+       NAT/Masquerading
+---------------> | icmptunnel | ------------>   | tun0 |    ---------------------> 
+<--------------- |  program   | <------------   +------+    <---------------------
+   restricted    |            |           (Virtual Interface)   proper internet
+    internet     +------------+
 ```
 
 ## Implementation
