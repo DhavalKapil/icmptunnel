@@ -1,8 +1,6 @@
 /**
  *  icmp.h
  */
-
-#include <stdint.h>
  
 #ifndef icmp_gaurd
 #define icmp_gaurd
