@@ -24,7 +24,7 @@ So basically the client machine uses only the ICMP protocol to communicate with 
 
 3. The proxy server should be accessible from the client host.
 
-_Note: Although `icmptunnel` has been successfully tested on Ubuntu 14.04 LTS, it should work on others as well._
+_Note: Although icmptunnel has been successfully tested on Ubuntu 14.04 LTS, it should work on others as well._
 
 ## Step-by-step instructions
 
@@ -90,23 +90,23 @@ On the client side, the IP packet is retrieved from the payload of the ICMP repl
 #### Client Architecture:
 
 ```
-+--------------+                                              +-------------+
-|              |    IP traffic    +------+      IP traffic    |             |       ICMP traffic
-|     User     |  ------------>   | tun0 |    ------------>   |  icmptunnel |   ------------------->
-| Applications |  <------------   +------+    <------------   |   program   |   <-------------------
-|              |             (Virtual Interface)              |             |   to restricted internet
-+--------------+                                              +-------------+
++--------------+                                    +------------+
+|              |  IP traffic  +------+  IP traffic  |            |    ICMP traffic
+|     User     |  --------->  | tun0 |  --------->  | icmptunnel | ------------------>
+| Applications |  <---------  +------+  <---------  |  program   | <------------------
+|              |        (Virtual Interface)         |            | restricted internet
++--------------+                                    +------------+
 ```
 
 #### Proxy Server Architecture:
 
 ```
-                           +-------------+
-     ICMP traffic          |             |     IP traffic    +------+          NAT/Masquerading
---------------------->     |  icmptunnel |   ------------>   | tun0 |      ------------------------> 
-<---------------------     |   program   |   <------------   +------+      <------------------------
-from restricted internet   |             |              (Virtual Interface)     proper internet
-                           +-------------+
+                    +------------+
+    ICMP traffic    |            |  IP traffic     +------+       NAT/Masquerading
+------------------> | icmptunnel | ------------>   | tun0 |    ---------------------> 
+<------------------ |  program   | <------------   +------+    <---------------------
+restricted internet |            |           (Virtual Interface)   proper internet
+                    +------------+
 ```
 
 ## Implementation
