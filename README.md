@@ -60,7 +60,9 @@ _Note: Although icmptunnel has been successfully tested on Ubuntu 14.04 LTS, it 
 
   Edit client.sh and replace \<server\> with the IP address of the proxy server. \<gateway\> with gateway address obtained above and similarly for \<interface\>.
 
-6. Run the tunnel on your client with root privelages:
+6. Check the DNS server at client side. Make sure it does not use any server not accessible by our proxy server. One suggestion is to use `8.8.8.8`(Google's DNS server) which is universal.
+
+7. Run the tunnel on your client with root privelages:
 
   ```
   [sudo] ./icmptunnel -c <server>
