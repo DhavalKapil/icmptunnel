@@ -6,13 +6,13 @@
 
 [RFC 792](http://www.ietf.org/rfc/rfc792.txt), which is IETF's rules governing ICMP packets, allows for an arbitrary data length for any type 0 (echo reply) or 8 (echo message) ICMP packets.
 
-So basically the client machine uses only the ICMP protocol to communicate with the proxy server. Applications running on the client machine are oblivious to this fact and act quite normally.
+So basically the client machine uses only the ICMP protocol to communicate with the proxy server. Applications running on the client machine are oblivious to this fact and work seamlessly.
 
 ## Use Cases:
 
-1. **Bypassing Captive Portals**: Many public Wi-Fi use [Captive Portals](https://en.wikipedia.org/wiki/Captive_portal) to authenticate users, i.e. after connecting to the Wi-Fi the user is redirected to a webpage that requires a login. icmptunnel can be used to bypass such upper layer authentications.
+1. **Bypassing Captive Portals**: Many public Wi-Fi use [Captive Portals](https://en.wikipedia.org/wiki/Captive_portal) to authenticate users, i.e. after connecting to the Wi-Fi the user is redirected to a webpage that requires a login. icmptunnel can be used to bypass such authentications in tranpost/application layers.
 
-2. **Bypassing firewalls**: Firewalls are set up in various networks to prevent certain kind of traffic. icmptunnel can be used to bypass such firewall rules. Obfuscating the data payload can also be helpful.
+2. **Bypassing firewalls**: Firewalls are set up in various networks to block certain type of traffic. icmptunnel can be used to bypass such firewall rules. Obfuscating the data payload can also be helpful to bypass some firewalls.
 
 3. **Encrypted Communication Channel**: Adding sufficient encryption to the data, icmptunnel can be used to establish an encrypted communication channel between two host machines. 
 
@@ -42,13 +42,13 @@ _Note: Although icmptunnel has been successfully tested on Ubuntu 14.04 LTS, it 
   make
   ```
 
-4. On the server side run the tunnel with root privelages:
+4. On the server side run the tunnel with root priveleges:
 
   ```
   [sudo] ./icmptunnel -s 10.0.1.1
   ```
 
-5. On the client side find out your gateway and the corresponding interface:
+5. On the client side, find out your gateway and the corresponding interface:
 
   ```
   route -n
@@ -60,7 +60,7 @@ _Note: Although icmptunnel has been successfully tested on Ubuntu 14.04 LTS, it 
 
   Edit client.sh and replace \<server\> with the IP address of the proxy server. \<gateway\> with gateway address obtained above and similarly for \<interface\>.
 
-6. Check the DNS server at client side. Make sure it does not use any server not accessible by our proxy server. One suggestion is to use `8.8.8.8`(Google's DNS server) which is universal.
+6. Check the DNS server at client side. Make sure it does not use any server not accessible by our proxy server. One suggestion is to use `8.8.8.8`(Google's DNS server) which will be accessible to the proxy server. You would need to edit your DNS settings for this. *You might need to manually delete the route for your local DNS server from your routing table.*
 
 7. Run the tunnel on your client with root privelages:
 
@@ -113,7 +113,65 @@ On the client side, the IP packet is retrieved from the payload of the ICMP repl
 
 ## Implementation
 
-ICMP is implemented using raw C sockets. The checksum is calculated using the algorithm given in [RFC 1071](https://tools.ietf.org/html/rfc1071). [Tun](https://www.kernel.org/doc/Documentation/networking/tuntap.txt) driver is used for creating a virtual interface and binding to user space programs. The virtual interface is configured through `ifconfig`. `route` is used to change the routing tables of the client so as to route all traffic to the virtual tunnel interface. `dd` is used to temporarily change the setting of IP forwarding and replying back to ICMP requests on the side of the proxy server. `iptables` is used to implement Masquerading on the server side.
+* ICMP is implemented using raw C sockets.
+
+* The checksum is calculated using the algorithm given in [RFC 1071](https://tools.ietf.org/html/rfc1071).
+
+* [Tun](https://www.kernel.org/doc/Documentation/networking/tuntap.txt) driver is used for creating a virtual interface and binding to user space programs.
+
+* The virtual interface is configured through `ifconfig`.
+
+* `route` is used to change the routing tables of the client so as to route all traffic to the virtual tunnel interface.
+
+* `dd` is used to temporarily change the setting of IP forwarding and replying back to ICMP requests on the side of the proxy server.
+
+* `iptables` is used to set up `nat` on the server side.
+
+## Demo
+
+### Network Setup: 
+
+Proxy server is connected to `eth0`. This interface provides full internet connection.
+
+Both the client and proxy server are connected to `wlan0`(a WiFi hotspot). This hotspot is configured not to provide any internet connection.
+
+`tun0` will be created in both the client and the proxy server.
+
+The client will make an HTTP request to [dhavalkapil.com](https://dhavalkapil.com).
+
+[Wireshark](url) is used to capture network traffic at both ends on various interface.
+
+### Screenshots of network traffic:
+
+1. `tun0` on client side
+
+  ![]()
+
+  The usual HTTP request is visible alongwith response.
+
+2. `wlan0` on client side
+
+  ![]()
+
+  All traffic is ICMP. The HTTP/IP packet can be seen as part of the payload of the ICMP packet.
+
+3. `wlan0` on proxy server side
+
+  ![]()
+
+  The ICMP packets sent by the client can be seen.
+
+4. `tun0` on proxy server side
+
+  ![]()
+
+  The HTTP/IP packets are decapsulated and sent through `tun0`.
+
+5. `eth0` on proxy server side
+
+  ![]()
+  
+  The HTTP/IP packets are forwarded to the internet. Notice how the source IP has been masqueraded because of `nat`.
 
 ## License
 
