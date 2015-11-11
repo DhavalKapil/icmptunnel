@@ -4,31 +4,6 @@
     <meta charset="UTF-8">
     <title>icmptunnel by DhavalKapil</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <meta name="author" content="Dhaval Kapil">
-    <meta name="keywords" content="icmp, IP, tunnel, tunneling, network, project, tun, bypass, captive, portal, firewall, virtual, interface, dhaval, kapil, vampire, iit roorkee, developer">
-    <meta name="description" content="Transparently tunnel your IP traffic through ICMP echo and reply packets">
-
-    <meta property="og:title" content="icmptunnel">
-    <meta name="og:description" content="Transparently tunnel your IP traffic through ICMP echo and reply packets">
-    <meta property="og:url" content="https://dhavalkapil.com/icmptunnel/">
-    <meta property="og:site_name" content="https://dhavalkapil.com">
-    <meta property="og:image" content="https://dhavalkapil.com/assets/images/profile.jpg">
-    <meta property="fb:admins" content="100006280205504">
-     
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="icmptunnel">
-    <meta name="twitter:image" content="https://dhavalkapil.com/assets/images/profile.jpg">
-    <meta name="twitter:creator" content="@dhaval_kapil">
-    <meta name="twitter:site" content="@dhaval_kapil">
-    <meta name="twitter:url" content="https://dhavalkapil.com/icmptunnel/">
-    <meta name="twitter:description" content="Transparently tunnel your IP traffic through ICMP echo and reply packets">
-
-    <link rel="canonical" href="https://dhavalkapil.com/icmptunnel/">
-    <link rel="shortcut icon" href="/assets/images/favicon.png">
-    <link rel="me" href="https://plus.google.com/+DhavalKapildk">
-    <link rel="me" href="https://www.facebook.com/dhaval.kapil">
-
     <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
@@ -45,7 +20,8 @@
 
     <section class="main-content">
       <h1>
-<a id="icmptunnel" class="anchor" href="#icmptunnel" aria-hidden="true"><span class="octicon octicon-link"></span></a>icmptunnel</h1>
+<a id="icmptunnel-" class="anchor" href="#icmptunnel-" aria-hidden="true"><span class="octicon octicon-link"></span></a>icmptunnel <a href="https://travis-ci.org/DhavalKapil/icmptunnel"><img src="https://travis-ci.org/DhavalKapil/icmptunnel.svg?branch=master" alt="Build Status"></a>
+</h1>
 
 <blockquote>
 <p>Transparently tunnel your IP traffic through ICMP echo and reply packets.</p>
@@ -58,10 +34,10 @@
 <p>So basically the client machine uses only the ICMP protocol to communicate with the proxy server. Applications running on the client machine are oblivious to this fact and work seamlessly.</p>
 
 <h2>
-<a id="use-cases" class="anchor" href="#use-cases" aria-hidden="true"><span class="octicon octicon-link"></span></a>Use Cases:</h2>
+<a id="use-cases" class="anchor" href="#use-cases" aria-hidden="true"><span class="octicon octicon-link"></span></a>Use Cases</h2>
 
 <ol>
-<li><p><strong>Bypassing Captive Portals</strong>: Many public Wi-Fi use <a href="https://en.wikipedia.org/wiki/Captive_portal">Captive Portals</a> to authenticate users, i.e. after connecting to the Wi-Fi the user is redirected to a webpage that requires a login. icmptunnel can be used to bypass such authentications in tranpost/application layers.</p></li>
+<li><p><strong>Bypassing Captive Portals</strong>: Many public Wi-Fi use <a href="https://en.wikipedia.org/wiki/Captive_portal">Captive Portals</a> to authenticate users, i.e. after connecting to the Wi-Fi the user is redirected to a webpage that requires a login. icmptunnel can be used to bypass such authentications in transport/application layers.</p></li>
 <li><p><strong>Bypassing firewalls</strong>: Firewalls are set up in various networks to block certain type of traffic. icmptunnel can be used to bypass such firewall rules. Obfuscating the data payload can also be helpful to bypass some firewalls.</p></li>
 <li><p><strong>Encrypted Communication Channel</strong>: Adding sufficient encryption to the data, icmptunnel can be used to establish an encrypted communication channel between two host machines. </p></li>
 </ol>
@@ -95,7 +71,7 @@
 </code></pre>
 </li>
 <li>
-<p>On the server side run the tunnel with root priveleges:</p>
+<p>On the server side run the tunnel with root privileges:</p>
 
 <pre><code>[sudo] ./icmptunnel -s 10.0.1.1
 </code></pre>
@@ -114,7 +90,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 </li>
 <li><p>Check the DNS server at client side. Make sure it does not use any server not accessible by our proxy server. One suggestion is to use <code>8.8.8.8</code>(Google's DNS server) which will be accessible to the proxy server. You would need to edit your DNS settings for this. <em>You might need to manually delete the route for your local DNS server from your routing table.</em></p></li>
 <li>
-<p>Run the tunnel on your client with root privelages:</p>
+<p>Run the tunnel on your client with root privileges:</p>
 
 <pre><code>[sudo] ./icmptunnel -c &lt;server&gt;
 </code></pre>
@@ -133,7 +109,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 <p>On the client side, the IP packet is retrieved from the payload of the ICMP reply packet and injected in <code>tun0</code>. The user applications read from this virtual interface and hence get the proper IP packet.</p>
 
 <h4>
-<a id="overall-architecture" class="anchor" href="#overall-architecture" aria-hidden="true"><span class="octicon octicon-link"></span></a>Overall Architecture:</h4>
+<a id="overall-architecture" class="anchor" href="#overall-architecture" aria-hidden="true"><span class="octicon octicon-link"></span></a>Overall Architecture</h4>
 
 <pre><code>+--------------+                         +------------+
 |              |       ICMP traffic      |            |       IP traffic
@@ -144,7 +120,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 </code></pre>
 
 <h4>
-<a id="client-architecture" class="anchor" href="#client-architecture" aria-hidden="true"><span class="octicon octicon-link"></span></a>Client Architecture:</h4>
+<a id="client-architecture" class="anchor" href="#client-architecture" aria-hidden="true"><span class="octicon octicon-link"></span></a>Client Architecture</h4>
 
 <pre><code>+--------------+                                    +------------+
 |              |  IP traffic  +------+  IP traffic  |            |   ICMP traffic
@@ -155,7 +131,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 </code></pre>
 
 <h4>
-<a id="proxy-server-architecture" class="anchor" href="#proxy-server-architecture" aria-hidden="true"><span class="octicon octicon-link"></span></a>Proxy Server Architecture:</h4>
+<a id="proxy-server-architecture" class="anchor" href="#proxy-server-architecture" aria-hidden="true"><span class="octicon octicon-link"></span></a>Proxy Server Architecture</h4>
 
 <pre><code>                 +------------+
   ICMP traffic   |            |  IP traffic     +------+       NAT/Masquerading
@@ -182,7 +158,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 <a id="demo" class="anchor" href="#demo" aria-hidden="true"><span class="octicon octicon-link"></span></a>Demo</h2>
 
 <h3>
-<a id="network-setup" class="anchor" href="#network-setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Network Setup:</h3>
+<a id="network-setup" class="anchor" href="#network-setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Network Setup</h3>
 
 <p>Proxy server is connected to <code>eth0</code>. This interface provides full internet connection.</p>
 
@@ -195,7 +171,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 <p><a href="https://www.wireshark.org/">Wireshark</a> is used to capture network traffic at both ends on various interface.</p>
 
 <h3>
-<a id="screenshots-of-network-traffic" class="anchor" href="#screenshots-of-network-traffic" aria-hidden="true"><span class="octicon octicon-link"></span></a>Screenshots of network traffic:</h3>
+<a id="screenshots-of-network-traffic" class="anchor" href="#screenshots-of-network-traffic" aria-hidden="true"><span class="octicon octicon-link"></span></a>Screenshots of network traffic</h3>
 
 <ol>
 <li>
@@ -203,7 +179,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 
 <p><img src="https://i.imgur.com/EnStcDO.png?1" alt="tun0 client side"></p>
 
-<p>The usual HTTP request is visible alongwith response.</p>
+<p>The usual HTTP request is visible along with response.</p>
 </li>
 <li>
 <p><code>wlan0</code> on client side</p>
@@ -238,7 +214,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 <h2>
 <a id="contribution" class="anchor" href="#contribution" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contribution</h2>
 
-<p>Feel free to <a href="https://github.com/DhavalKapil/icmptunnel/issues">file issues</a> and submit <a href="https://github.com/DhavalKapil/icmptunnel/pulls">pull requests</a> - contributions are welcome.</p>
+<p>Feel free to <a href="https://github.com/DhavalKapil/icmptunnel/issues">file issues</a> and submit <a href="https://github.com/DhavalKapil/icmptunnel/pulls">pull requests</a> – contributions are welcome.</p>
 
 <h2>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
