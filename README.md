@@ -139,39 +139,43 @@ Both the client and proxy server are connected to `wlan0`(a WiFi hotspot). This 
 
 The client will make an HTTP request to [dhavalkapil.com](https://dhavalkapil.com).
 
-[Wireshark](url) is used to capture network traffic at both ends on various interface.
+[Wireshark](https://www.wireshark.org/) is used to capture network traffic at both ends on various interface.
 
 ### Screenshots of network traffic:
 
 1. `tun0` on client side
 
-  ![tun0 client side](https://raw.githubusercontent.com/DhavalKapil/icmptunnel/gh-pages/images/tun0_client.png)
+  ![tun0 client side](http://i.imgur.com/EnStcDO.png?1)
 
   The usual HTTP request is visible alongwith response.
 
 2. `wlan0` on client side
 
-  ![wlan0 client side](https://raw.githubusercontent.com/DhavalKapil/icmptunnel/gh-pages/images/wlan0_client.png)
+  ![wlan0 client side](http://i.imgur.com/EKEqCGv.png?1)
 
   All traffic is ICMP. The HTTP/IP packet can be seen as part of the payload of the ICMP packet.
 
 3. `wlan0` on proxy server side
 
-  ![wlan0 proxy server side](https://raw.githubusercontent.com/DhavalKapil/icmptunnel/gh-pages/images/wlan0_proxy_server.png)
+  ![wlan0 proxy server side](http://i.imgur.com/6OhsUyZ.png?1)
 
   The ICMP packets sent by the client can be seen.
 
 4. `tun0` on proxy server side
 
-  ![tun0 proxy server side](https://raw.githubusercontent.com/DhavalKapil/icmptunnel/gh-pages/images/tun0_proxy_server.png)
+  ![tun0 proxy server side](http://i.imgur.com/OCq9aZe.png?1)
 
   The HTTP/IP packets are decapsulated and sent through `tun0`.
 
 5. `eth0` on proxy server side
 
-  ![eth0 proxy server side](https://raw.githubusercontent.com/DhavalKapil/icmptunnel/gh-pages/images/eth0_proxy_server.png)
+  ![eth0 proxy server side](http://i.imgur.com/HQigUea.png?1)
   
   The HTTP/IP packets are forwarded to the internet. Notice how the source IP has been masqueraded because of `nat`.
+
+## Contribution
+
+Feel free to [file issues](https://github.com/DhavalKapil/icmptunnel/issues) and submit [pull requests](https://github.com/DhavalKapil/icmptunnel/pulls) - contributions are welcome.
 
 ## License
 
