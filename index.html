@@ -176,35 +176,35 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 <li>
 <p><code>tun0</code> on client side</p>
 
-<p><img src="http://i.imgur.com/EnStcDO.png?1" alt="tun0 client side"></p>
+<p><img src="https://i.imgur.com/EnStcDO.png?1" alt="tun0 client side"></p>
 
 <p>The usual HTTP request is visible alongwith response.</p>
 </li>
 <li>
 <p><code>wlan0</code> on client side</p>
 
-<p><img src="http://i.imgur.com/EKEqCGv.png?1" alt="wlan0 client side"></p>
+<p><img src="https://i.imgur.com/EKEqCGv.png?1" alt="wlan0 client side"></p>
 
 <p>All traffic is ICMP. The HTTP/IP packet can be seen as part of the payload of the ICMP packet.</p>
 </li>
 <li>
 <p><code>wlan0</code> on proxy server side</p>
 
-<p><img src="http://i.imgur.com/6OhsUyZ.png?1" alt="wlan0 proxy server side"></p>
+<p><img src="https://i.imgur.com/6OhsUyZ.png?1" alt="wlan0 proxy server side"></p>
 
 <p>The ICMP packets sent by the client can be seen.</p>
 </li>
 <li>
 <p><code>tun0</code> on proxy server side</p>
 
-<p><img src="http://i.imgur.com/OCq9aZe.png?1" alt="tun0 proxy server side"></p>
+<p><img src="https://i.imgur.com/OCq9aZe.png?1" alt="tun0 proxy server side"></p>
 
 <p>The HTTP/IP packets are decapsulated and sent through <code>tun0</code>.</p>
 </li>
 <li>
 <p><code>eth0</code> on proxy server side</p>
 
-<p><img src="http://i.imgur.com/HQigUea.png?1" alt="eth0 proxy server side"></p>
+<p><img src="https://i.imgur.com/HQigUea.png?1" alt="eth0 proxy server side"></p>
 
 <p>The HTTP/IP packets are forwarded to the internet. Notice how the source IP has been masqueraded because of <code>nat</code>.</p>
 </li>
