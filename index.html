@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>icmptunnel by DhavalKapil</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">icmptunnel</h1>
+      <h2 class="project-tagline">Transparently tunnel your IP traffic through ICMP echo and reply packets.</h2>
+      <a href="https://github.com/DhavalKapil/icmptunnel" class="btn">View on GitHub</a>
+      <a href="https://github.com/DhavalKapil/icmptunnel/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/DhavalKapil/icmptunnel/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="icmptunnel" class="anchor" href="#icmptunnel" aria-hidden="true"><span class="octicon octicon-link"></span></a>icmptunnel</h1>
+
+<blockquote>
+<p>Transparently tunnel your IP traffic through ICMP echo and reply packets.</p>
+</blockquote>
+
+<p>'icmptunnel' works by encapsulating your IP traffic in ICMP echo packets and sending them to your own proxy server. The proxy server decapsulates the packet and forwards the IP traffic. The incoming IP packets which are destined for the client are again encapsulated in ICMP reply packets and sent back to the client. The IP traffic is sent in the 'data' field of ICMP packets.</p>
+
+<p><a href="http://www.ietf.org/rfc/rfc792.txt">RFC 792</a>, which is IETF's rules governing ICMP packets, allows for an arbitrary data length for any type 0 (echo reply) or 8 (echo message) ICMP packets.</p>
+
+<p>So basically the client machine uses only the ICMP protocol to communicate with the proxy server. Applications running on the client machine are oblivious to this fact and work seamlessly.</p>
+
+<h2>
+<a id="use-cases" class="anchor" href="#use-cases" aria-hidden="true"><span class="octicon octicon-link"></span></a>Use Cases:</h2>
+
+<ol>
+<li><p><strong>Bypassing Captive Portals</strong>: Many public Wi-Fi use <a href="https://en.wikipedia.org/wiki/Captive_portal">Captive Portals</a> to authenticate users, i.e. after connecting to the Wi-Fi the user is redirected to a webpage that requires a login. icmptunnel can be used to bypass such authentications in tranpost/application layers.</p></li>
+<li><p><strong>Bypassing firewalls</strong>: Firewalls are set up in various networks to block certain type of traffic. icmptunnel can be used to bypass such firewall rules. Obfuscating the data payload can also be helpful to bypass some firewalls.</p></li>
+<li><p><strong>Encrypted Communication Channel</strong>: Adding sufficient encryption to the data, icmptunnel can be used to establish an encrypted communication channel between two host machines. </p></li>
+</ol>
+
+<h2>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements</h2>
+
+<ol>
+<li><p>A POSIX-compliant host with root access that will be communicating with only ICMP protocol. This will be the client.</p></li>
+<li><p>A POSIX-compliant host with root access with full access to the internet. This will act as our proxy server.</p></li>
+<li><p>The proxy server should be accessible from the client host.</p></li>
+</ol>
+
+<p><em>Note: Although icmptunnel has been successfully tested on Ubuntu 14.04 LTS, it should work on others as well.</em></p>
+
+<h2>
+<a id="step-by-step-instructions" class="anchor" href="#step-by-step-instructions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Step-by-step instructions</h2>
+
+<ol>
+<li><p>Install <code>make</code> on both machines.</p></li>
+<li>
+<p>Clone this repository using this command:</p>
+
+<pre><code>git clone https://github.com/DhavalKapil/icmptunnel
+</code></pre>
+</li>
+<li>
+<p>Run <code>make</code>:</p>
+
+<pre><code>make
+</code></pre>
+</li>
+<li>
+<p>On the server side run the tunnel with root priveleges:</p>
+
+<pre><code>[sudo] ./icmptunnel -s 10.0.1.1
+</code></pre>
+</li>
+<li>
+<p>On the client side, find out your gateway and the corresponding interface:</p>
+
+<pre><code>route -n
+
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+
+0.0.0.0         172.25.30.1     0.0.0.0         UG    0      0        0 eth0
+</code></pre>
+
+<p>Edit client.sh and replace &lt;server&gt; with the IP address of the proxy server. &lt;gateway&gt; with gateway address obtained above and similarly for &lt;interface&gt;.</p>
+</li>
+<li><p>Check the DNS server at client side. Make sure it does not use any server not accessible by our proxy server. One suggestion is to use <code>8.8.8.8</code>(Google's DNS server) which will be accessible to the proxy server. You would need to edit your DNS settings for this. <em>You might need to manually delete the route for your local DNS server from your routing table.</em></p></li>
+<li>
+<p>Run the tunnel on your client with root privelages:</p>
+
+<pre><code>[sudo] ./icmptunnel -c &lt;server&gt;
+</code></pre>
+</li>
+</ol>
+
+<p>The tunnel should run and your client machine should be able to access the internet. All traffic will be tunneled through ICMP.</p>
+
+<h2>
+<a id="architecture" class="anchor" href="#architecture" aria-hidden="true"><span class="octicon octicon-link"></span></a>Architecture</h2>
+
+<p>icmptunnel works by creating a virtual tunnel interface(say <code>tun0</code>). All the user traffic on the client host is routed to <code>tun0</code>. icmptunnel listens on this interface for IP packets. These packets are encapsulated in an ICMP echo packet(i.e. the payload of the ICMP packet is nothing but the original IP packet). This newly generated ICMP packet is sent outside the client machine, to the proxy server, through the restricted internet connection.</p>
+
+<p>The proxy server receives these ICMP packets and decapsulates the original IP packet. This is retransmitted onto the Internet after implementing IP masquerading. Hence, the target believes that its the proxy server making the request. The target then responds back to the proxy server with an IP packet. This is again captured by icmptunnel, encapsulated in an ICMP reply packet and send back to the client. </p>
+
+<p>On the client side, the IP packet is retrieved from the payload of the ICMP reply packet and injected in <code>tun0</code>. The user applications read from this virtual interface and hence get the proper IP packet.</p>
+
+<h4>
+<a id="overall-architecture" class="anchor" href="#overall-architecture" aria-hidden="true"><span class="octicon octicon-link"></span></a>Overall Architecture:</h4>
+
+<pre><code>+--------------+                         +------------+
+|              |       ICMP traffic      |            |       IP traffic
+|    Client    |  -------------------&gt;   |   Proxy    |   ------------------&gt;
+|              |  &lt;-------------------   |   Server   |   &lt;------------------
+|              |    through restricted   |            |     proper internet
++--------------+         internet        +------------+
+</code></pre>
+
+<h4>
+<a id="client-architecture" class="anchor" href="#client-architecture" aria-hidden="true"><span class="octicon octicon-link"></span></a>Client Architecture:</h4>
+
+<pre><code>+--------------+                                    +------------+
+|              |  IP traffic  +------+  IP traffic  |            |   ICMP traffic
+|     User     |  ---------&gt;  | tun0 |  ---------&gt;  | icmptunnel | ---------------&gt;
+| Applications |  &lt;---------  +------+  &lt;---------  |  program   | &lt;---------------
+|              |        (Virtual Interface)         |            |    restricted 
++--------------+                                    +------------+     internet
+</code></pre>
+
+<h4>
+<a id="proxy-server-architecture" class="anchor" href="#proxy-server-architecture" aria-hidden="true"><span class="octicon octicon-link"></span></a>Proxy Server Architecture:</h4>
+
+<pre><code>                 +------------+
+  ICMP traffic   |            |  IP traffic     +------+       NAT/Masquerading
+---------------&gt; | icmptunnel | ------------&gt;   | tun0 |    ---------------------&gt; 
+&lt;--------------- |  program   | &lt;------------   +------+    &lt;---------------------
+   restricted    |            |           (Virtual Interface)   proper internet
+    internet     +------------+
+</code></pre>
+
+<h2>
+<a id="implementation" class="anchor" href="#implementation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Implementation</h2>
+
+<ul>
+<li><p>ICMP is implemented using raw C sockets.</p></li>
+<li><p>The checksum is calculated using the algorithm given in <a href="https://tools.ietf.org/html/rfc1071">RFC 1071</a>.</p></li>
+<li><p><a href="https://www.kernel.org/doc/Documentation/networking/tuntap.txt">Tun</a> driver is used for creating a virtual interface and binding to user space programs.</p></li>
+<li><p>The virtual interface is configured through <code>ifconfig</code>.</p></li>
+<li><p><code>route</code> is used to change the routing tables of the client so as to route all traffic to the virtual tunnel interface.</p></li>
+<li><p><code>dd</code> is used to temporarily change the setting of IP forwarding and replying back to ICMP requests on the side of the proxy server.</p></li>
+<li><p><code>iptables</code> is used to set up <code>nat</code> on the server side.</p></li>
+</ul>
+
+<h2>
+<a id="demo" class="anchor" href="#demo" aria-hidden="true"><span class="octicon octicon-link"></span></a>Demo</h2>
+
+<h3>
+<a id="network-setup" class="anchor" href="#network-setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Network Setup:</h3>
+
+<p>Proxy server is connected to <code>eth0</code>. This interface provides full internet connection.</p>
+
+<p>Both the client and proxy server are connected to <code>wlan0</code>(a WiFi hotspot). This hotspot is configured not to provide any internet connection.</p>
+
+<p><code>tun0</code> will be created in both the client and the proxy server.</p>
+
+<p>The client will make an HTTP request to <a href="https://dhavalkapil.com">dhavalkapil.com</a>.</p>
+
+<p><a href="url">Wireshark</a> is used to capture network traffic at both ends on various interface.</p>
+
+<h3>
+<a id="screenshots-of-network-traffic" class="anchor" href="#screenshots-of-network-traffic" aria-hidden="true"><span class="octicon octicon-link"></span></a>Screenshots of network traffic:</h3>
+
+<ol>
+<li>
+<p><code>tun0</code> on client side</p>
+
+<p>[]()</p>
+
+<p>The usual HTTP request is visible alongwith response.</p>
+</li>
+<li>
+<p><code>wlan0</code> on client side</p>
+
+<p>[]()</p>
+
+<p>All traffic is ICMP. The HTTP/IP packet can be seen as part of the payload of the ICMP packet.</p>
+</li>
+<li>
+<p><code>wlan0</code> on proxy server side</p>
+
+<p>[]()</p>
+
+<p>The ICMP packets sent by the client can be seen.</p>
+</li>
+<li>
+<p><code>tun0</code> on proxy server side</p>
+
+<p>[]()</p>
+
+<p>The HTTP/IP packets are decapsulated and sent through <code>tun0</code>.</p>
+</li>
+<li>
+<p><code>eth0</code> on proxy server side</p>
+
+<p>[]()</p>
+
+<p>The HTTP/IP packets are forwarded to the internet. Notice how the source IP has been masqueraded because of <code>nat</code>.</p>
+</li>
+</ol>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>icmptunnel is licensed under the <a href="http://dhaval.mit-license.org/">MIT license</a>.</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/DhavalKapil/icmptunnel">icmptunnel</a> is maintained by <a href="https://github.com/DhavalKapil">DhavalKapil</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+            <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-51308700-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
