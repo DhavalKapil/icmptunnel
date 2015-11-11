@@ -176,35 +176,35 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 <li>
 <p><code>tun0</code> on client side</p>
 
-<p>[]()</p>
+<p><img src="https://raw.githubusercontent.com/DhavalKapil/icmptunnel/gh-pages/images/tun0_client.png" alt="tun0 client side"></p>
 
 <p>The usual HTTP request is visible alongwith response.</p>
 </li>
 <li>
 <p><code>wlan0</code> on client side</p>
 
-<p>[]()</p>
+<p><img src="https://raw.githubusercontent.com/DhavalKapil/icmptunnel/gh-pages/images/wlan0_client.png" alt="wlan0 client side"></p>
 
 <p>All traffic is ICMP. The HTTP/IP packet can be seen as part of the payload of the ICMP packet.</p>
 </li>
 <li>
 <p><code>wlan0</code> on proxy server side</p>
 
-<p>[]()</p>
+<p><img src="https://raw.githubusercontent.com/DhavalKapil/icmptunnel/gh-pages/images/wlan0_proxy_server.png" alt="wlan0 proxy server side"></p>
 
 <p>The ICMP packets sent by the client can be seen.</p>
 </li>
 <li>
 <p><code>tun0</code> on proxy server side</p>
 
-<p>[]()</p>
+<p><img src="https://raw.githubusercontent.com/DhavalKapil/icmptunnel/gh-pages/images/tun0_proxy_server.png" alt="tun0 proxy server side"></p>
 
 <p>The HTTP/IP packets are decapsulated and sent through <code>tun0</code>.</p>
 </li>
 <li>
 <p><code>eth0</code> on proxy server side</p>
 
-<p>[]()</p>
+<p><img src="https://raw.githubusercontent.com/DhavalKapil/icmptunnel/gh-pages/images/eth0_proxy_server.png" alt="eth0 proxy server side"></p>
 
 <p>The HTTP/IP packets are forwarded to the internet. Notice how the source IP has been masqueraded because of <code>nat</code>.</p>
 </li>
