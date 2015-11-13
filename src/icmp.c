@@ -101,15 +101,13 @@ void send_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
   inet_pton(AF_INET, packet_details->dest_addr, &dest_addr);
 
   packet_size = sizeof(struct iphdr) + sizeof(struct icmphdr) + packet_details->payload_size;
-  packet = (char *)malloc(packet_size);
+  packet = (char *)calloc(packet_size, sizeof *packet);
   if (packet == NULL) {
     printf("No memory available\n");
     close_icmp_socket(sock_fd);
     exit(-1);
   }
-  memset(packet, 0, packet_size);
 
-  // Initializing header and payload pointers
   ip = (struct iphdr *)packet;
   icmp = (struct icmphdr *)(packet + sizeof(struct iphdr));
   icmp_payload = (char *)(packet + sizeof(struct iphdr) + sizeof(struct icmphdr));
@@ -153,8 +151,7 @@ void receive_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
 
   int src_addr_size;
 
-  packet = (char *)malloc(MTU);
-  memset(packet, 0, MTU);
+  packet = (char *)calloc(MTU, sizeof *packet);
 
   src_addr_size = sizeof(struct sockaddr_in);
   
