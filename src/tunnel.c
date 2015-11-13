@@ -208,7 +208,9 @@ void run_tunnel(char *dest, int server)
       tun_write(tun_fd, packet.payload, packet.payload_size);
 
       printf("[DEBUG] Src address being copied: %s\n", packet.src_addr);
-      strcpy(dest, packet.src_addr, sizeof(dest)-1);
+      strncpy(dest, packet.src_addr, sizeof(dest)-1);
+      dest[sizeof(dest)-1]=0;
+    }
   }
 
 }
