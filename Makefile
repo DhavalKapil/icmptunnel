@@ -1,8 +1,11 @@
 CC=gcc
-CFLAGS=-I.
-DEPS = icmp.h tunnel.h
+CFLAGS=-I$(IDIR)
+IDIR=include
+_DEPS=icmp.h tunnel.h 
+DEPS=${_DEPS:%=$(IDIR)/%} 
+SRCDIR=src
 
-%.o: %.c $(DEPS)
+%.o: $(SRCDIR)/%.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 icmptunnel: icmptunnel.o icmp.o tunnel.o
