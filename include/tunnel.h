@@ -18,7 +18,7 @@ int tun_alloc(char *dev, int flags);
  */
 int tun_read(int tun_fd, char *buffer, int length);
 
-/**k
+/**
  * @brief Function to write to a tunnel
  */
 int tun_write(int tun_fd, char *buffer, int length);

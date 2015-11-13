@@ -108,6 +108,7 @@ void send_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
     exit(-1);
   }
 
+  // Initializing header and payload pointers
   ip = (struct iphdr *)packet;
   icmp = (struct icmphdr *)(packet + sizeof(struct iphdr));
   icmp_payload = (char *)(packet + sizeof(struct iphdr) + sizeof(struct icmphdr));
