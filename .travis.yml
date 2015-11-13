@@ -1,4 +1,4 @@
-language: cpp
+language: c
 
 before_script:  
     - mkdir build
