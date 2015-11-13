@@ -28,7 +28,10 @@ _Note: Although icmptunnel has been successfully tested on Ubuntu 14.04 LTS, it 
 
 ## Step-by-step instructions
 
-1. Install `make` on both machines.
+1. Install `cmake` on both machines.
+  ```
+  sudo apt-get install cmake
+  ```
 
 2. Clone this repository using this command:
 
@@ -36,10 +39,10 @@ _Note: Although icmptunnel has been successfully tested on Ubuntu 14.04 LTS, it 
   git clone https://github.com/DhavalKapil/icmptunnel
   ```
 
-3. Run `make`:
+3. Make a new directory `build`, `cd` into it, build executables :
 
   ```
-  make
+  mkdir build && cd $_ && cmake .. && make
   ```
 
 4. On the server side run the tunnel with root privileges:
