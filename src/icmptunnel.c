@@ -1,9 +1,8 @@
 /**
- * icmp_tunnel.c
+ * @file icmp_tunnel.c
  */
 
 #include "tunnel.h"
-
 #include <string.h>
 
 int main(int argc, char *argv[])

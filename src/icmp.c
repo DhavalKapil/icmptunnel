@@ -1,5 +1,5 @@
 /**
- *  icmp.c
+ *  @file icmp.c
  */
 
 #include "icmp.h"
@@ -12,17 +12,17 @@
 #include <stdlib.h>
 
 /**
- * Function to calculate checksum
+ * @brief Function to calculate checksum
  */
 uint16_t in_cksum(uint16_t *addr, int len);
 
 /**
- * Function to fill up common headers for IP and ICMP
+ * @brief Function to fill up common headers for IP and ICMP
  */
 void prepare_headers(struct iphdr *ip, struct icmphdr *icmp);
 
 /**
- * Function to set packet type as ECHO
+ * @brief Function to set packet type as ECHO
  */
 void set_echo_type(struct icmp_packet *packet)
 {
@@ -30,7 +30,7 @@ void set_echo_type(struct icmp_packet *packet)
 }
 
 /**
- * Function to set packet type as REPLY
+ * @brief Function to set packet type as REPLY
  */
 void set_reply_type(struct icmp_packet *packet)
 {
@@ -38,7 +38,7 @@ void set_reply_type(struct icmp_packet *packet)
 }
 
 /**
- * Function to open a socket for icmp
+ * @brief Function to open a socket for icmp
  */
 int open_icmp_socket()
 {
@@ -61,7 +61,7 @@ int open_icmp_socket()
 }
 
 /**
- * Function to bind the socket to INADDR_ANY
+ * @brief Function to bind the socket to INADDR_ANY
  */
 void bind_icmp_socket(int sock_fd)
 {
@@ -80,7 +80,7 @@ void bind_icmp_socket(int sock_fd)
 }
 
 /**
- * Function to send ICMP Packet
+ * @brief Function to send ICMP Packet
  */
 void send_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
 {
@@ -101,13 +101,12 @@ void send_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
   inet_pton(AF_INET, packet_details->dest_addr, &dest_addr);
 
   packet_size = sizeof(struct iphdr) + sizeof(struct icmphdr) + packet_details->payload_size;
-  packet = (char *)malloc(packet_size);
+  packet = (char *)calloc(packet_size, sizeof *packet);
   if (packet == NULL) {
     printf("No memory available\n");
     close_icmp_socket(sock_fd);
     exit(-1);
   }
-  memset(packet, 0, packet_size);
 
   // Initializing header and payload pointers
   ip = (struct iphdr *)packet;
@@ -137,7 +136,7 @@ void send_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
 }
 
 /**
- * Function to receive an ICMP packet
+ * @brief Function to receive an ICMP packet
  */
 void receive_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
 {
@@ -153,8 +152,7 @@ void receive_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
 
   int src_addr_size;
 
-  packet = (char *)malloc(MTU);
-  memset(packet, 0, MTU);
+  packet = (char *)calloc(MTU, sizeof *packet);
 
   src_addr_size = sizeof(struct sockaddr_in);
   
@@ -177,7 +175,7 @@ void receive_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
 }
 
 /**
- * Function to close the icmp socket
+ * @brief Function to close the icmp socket
  */
 void close_icmp_socket(int sock_fd)
 {
@@ -185,7 +183,7 @@ void close_icmp_socket(int sock_fd)
 }
 
 /**
- * Function to calculate checksum
+ * @brief Function to calculate checksum
  */
 uint16_t in_cksum(uint16_t *addr, int len)
 {
@@ -215,7 +213,7 @@ uint16_t in_cksum(uint16_t *addr, int len)
 }
 
 /**
- * Function to fill up common headers for IP and ICMP
+ * @brief Function to fill up common headers for IP and ICMP
  */
 void prepare_headers(struct iphdr *ip, struct icmphdr *icmp)
 {

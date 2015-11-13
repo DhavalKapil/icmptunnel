@@ -1,10 +1,9 @@
 /**
- *  tunnel.c
+ *  @file tunnel.c
  */
 
 #include "icmp.h"
 #include "tunnel.h"
-
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -21,7 +20,7 @@
 #include <arpa/inet.h>
 
 /**
- * Function to allocate a tunnel
+ * @brief Function to allocate a tunnel
  */
 int tun_alloc(char *dev, int flags)
 {
@@ -59,7 +58,7 @@ int tun_alloc(char *dev, int flags)
 }
 
 /**
- * Function to read from a tunnel
+ * @brief Function to read from a tunnel
  */
 int tun_read(int tun_fd, char *buffer, int length)
 {
@@ -77,7 +76,7 @@ int tun_read(int tun_fd, char *buffer, int length)
 }
 
 /**
- * Function to write to a tunnel
+ * @brief Function to write to a tunnel
  */
 int tun_write(int tun_fd, char *buffer, int length)
 {
@@ -95,7 +94,7 @@ int tun_write(int tun_fd, char *buffer, int length)
 }
 
 /**
- * Function to configure the network
+ * @brief Function to configure the network
  */
 void configure_network(int server)
 {
@@ -104,10 +103,10 @@ void configure_network(int server)
   char *const args[] = {path, NULL};
 
   if (server) {
-    strcpy(path, SERVER_SCRIPT);
+    strncpy(path, SERVER_SCRIPT, sizeof(SERVER_SCRIPT)-1);
   }
   else {
-    strcpy(path, CLIENT_SCRIPT);
+    strncpy(path, CLIENT_SCRIPT, sizeof(CLIENT_SCRIPT)-1);
   }
 
   pid = fork();
@@ -137,7 +136,7 @@ void configure_network(int server)
 
 
 /**
- * Function to run the tunnel
+ * @brief Function to run the tunnel
  */
 void run_tunnel(char *dest, int server)
 {
@@ -174,8 +173,8 @@ void run_tunnel(char *dest, int server)
       // Preparing ICMP packet to be sent
       memset(&packet, 0, sizeof(struct icmp_packet));
       printf("[DEBUG] Destination address: %s\n", dest);
-      strcpy(packet.src_addr, "0.0.0.0");
-      strcpy(packet.dest_addr, dest);
+      strncpy(packet.src_addr, "0.0.0.0", sizeof(packet.src_addr)-1);
+      strncpy(packet.dest_addr, dest, sizeof(packet.dest_addr)-1);
       if(server) {
         set_reply_type(&packet);
       }
@@ -209,7 +208,8 @@ void run_tunnel(char *dest, int server)
       tun_write(tun_fd, packet.payload, packet.payload_size);
 
       printf("[DEBUG] Src address being copied: %s\n", packet.src_addr);
-      strcpy(dest, packet.src_addr);
+      strncpy(dest, packet.src_addr, sizeof(dest)-1);
+      dest[sizeof(dest)-1]=0;
     }
   }
 
