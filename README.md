@@ -39,7 +39,8 @@ _Note: Although icmptunnel has been successfully tested on Ubuntu 14.04 LTS, it 
   git clone https://github.com/DhavalKapil/icmptunnel
   ```
 
-3. Make a new directory `build`, `cd` into it, build executables :
+3. Make a new directory `build`, `cd` into it, build executables. :   
+   (Documentation, if you have Doxygen, is generated in build/doc)
 
   ```
   mkdir build && cd $_ && cmake .. && make

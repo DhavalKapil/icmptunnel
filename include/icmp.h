@@ -1,11 +1,13 @@
 /**
- *  icmp.h
+ *  @file icmp.h
  */
  
 #ifndef icmp_gaurd
 #define icmp_gaurd
 
-// Maximum transmission unit
+/**
+ * @brief Maximum transmission unit
+ */
 #define MTU 1500
 
 struct icmp_packet
@@ -18,37 +20,37 @@ struct icmp_packet
 };
 
 /**
- * Function to set packet type as ECHO
+ * @brief Function to set packet type as ECHO
  */
 void set_echo_type(struct icmp_packet *packet);
 
 /**
- * Function to set packet type as REPLY
+ * @brief Function to set packet type as REPLY
  */
 void set_reply_type(struct icmp_packet *packet);
 
 /**
- * Function to open a socket for icmp
+ * @brief Function to open a socket for icmp
  */
 int open_icmp_socket();
 
 /**
- * Function to bind the socket to INADDR_ANY
+ * @brief Function to bind the socket to INADDR_ANY
  */
 void bind_icmp_socket(int sock_fd);
 
 /**
- * Function to send ICMP Packet
+ * @brief Function to send ICMP Packet
  */
 void send_icmp_packet(int sock_fd, struct icmp_packet *packet_details);
 
 /**
- * Function to receive ICMP Packet
+ * @brief Function to receive ICMP Packet
  */
 void receive_icmp_packet(int sock_fd, struct icmp_packet *packet_details);
 
 /**
- * Function to close the icmp socket
+ * @brief Function to close the icmp socket
  */
 void close_icmp_socket(int sock_fd);
 
