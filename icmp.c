@@ -3,6 +3,7 @@
  */
 
 #include "icmp.h"
+#include <arpa/inet.h>
 #include <stdint.h>
 #include <string.h>
 #include <netinet/ip.h>

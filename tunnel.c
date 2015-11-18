@@ -14,11 +14,13 @@
 #include <linux/if_tun.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
+#include <sys/wait.h>
 #include <fcntl.h>
 #include <netdb.h>
 #include <pwd.h>
 #include <pthread.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
 /**
  * Function to allocate a tunnel
