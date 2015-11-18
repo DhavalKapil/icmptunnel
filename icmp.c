@@ -53,7 +53,7 @@ int open_icmp_socket()
   
   // Providing IP Headers
   if (setsockopt(sock_fd, IPPROTO_IP, IP_HDRINCL, (const char *)&on, sizeof(on)) == -1) {
-    printf("Unable to set IP_HDRINCL socket option\n");
+    perror("Unable to set IP_HDRINCL socket option\n");
     exit(EXIT_FAILURE);
   }
 
@@ -74,7 +74,7 @@ void bind_icmp_socket(int sock_fd)
 
   // binding the socket
   if (bind(sock_fd, (struct sockaddr *)&servaddr, sizeof(struct sockaddr_in)) == -1) {
-    printf("Unable to bind\n");
+    perror("Unable to bind\n");
     exit(EXIT_FAILURE);
   }
 }
@@ -103,7 +103,7 @@ void send_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
   packet_size = sizeof(struct iphdr) + sizeof(struct icmphdr) + packet_details->payload_size;
   packet = (char *)malloc(packet_size);
   if (packet == NULL) {
-    printf("No memory available\n");
+    perror("No memory available\n");
     close_icmp_socket(sock_fd);
     exit(EXIT_FAILURE);
   }

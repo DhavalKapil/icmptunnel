@@ -28,7 +28,7 @@ int tun_alloc(char *dev, int flags)
   struct ifreq ifr;
   int tun_fd, err;
   char *clonedev = "/dev/net/tun";
-  printf("[DEBUG] Allocatating tunnel\n");
+  printf("[DEBUG] Allocating tunnel\n");
 
   tun_fd = open(clonedev, O_RDWR);
 
@@ -47,7 +47,8 @@ int tun_alloc(char *dev, int flags)
 
   if ((err=ioctl(tun_fd, TUNSETIFF, (void *)&ifr)) < 0) {
     close(tun_fd);
-    printf("Error: %d\n", err);
+    fprintf(stderr, "Error returned by ioctl(): %s\n", strerror(err));
+    perror("Error in tun_alloc()\n");
     exit(EXIT_FAILURE);
   }
 
@@ -185,7 +186,7 @@ void run_tunnel(char *dest, int server)
       packet.payload = malloc(MTU);
       packet.payload_size  = tun_read(tun_fd, packet.payload, MTU);
       if(packet.payload_size  == -1) {
-        printf("Error while reading from tun device\n");
+        perror("Error while reading from tun device\n");
         exit(EXIT_FAILURE);
       }
 
