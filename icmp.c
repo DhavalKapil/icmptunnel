@@ -174,12 +174,11 @@ void receive_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
   packet_details->type = icmp->type;
   packet_details->payload_size = packet_size - sizeof(struct iphdr) - sizeof(struct icmphdr);
   packet_details->payload = calloc(packet_details->payload_size, sizeof(uint8_t));
-  if (packet_details->payload_size == NULL) {
+  if (packet_details->payload == NULL) {
     printf("No memory available\n");
     close_icmp_socket(sock_fd);
     exit(-1);
   }
-
 
   memcpy(packet_details->payload, icmp_payload, packet_details->payload_size);
 

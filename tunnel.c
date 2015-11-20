@@ -20,6 +20,9 @@
 #include <pthread.h>
 #include <arpa/inet.h>
 
+
+#define DEFAULT_ROUTE   "0.0.0.0"
+
 /**
  * Function to allocate a tunnel
  */
@@ -104,10 +107,18 @@ void configure_network(int server)
   char *const args[] = {path, NULL};
 
   if (server) {
-    strcpy(path, SERVER_SCRIPT);
+    if (sizeof(SERVER_SCRIPT) > sizeof(path)){
+        printf("Server script path is too long\n");
+        exit(EXIT_FAILURE);
+    }
+    strncpy(path, SERVER_SCRIPT, strlen(SERVER_SCRIPT) + 1);
   }
   else {
-    strcpy(path, CLIENT_SCRIPT);
+    if (sizeof(CLIENT_SCRIPT) > sizeof(path)){
+        printf("Client script path is too long\n");
+        exit(EXIT_FAILURE);
+    }
+    strncpy(path, CLIENT_SCRIPT, strlen(CLIENT_SCRIPT) + 1);
   }
 
   pid = fork();
@@ -174,8 +185,23 @@ void run_tunnel(char *dest, int server)
       // Preparing ICMP packet to be sent
       memset(&packet, 0, sizeof(struct icmp_packet));
       printf("[DEBUG] Destination address: %s\n", dest);
-      strcpy(packet.src_addr, "0.0.0.0");
-      strcpy(packet.dest_addr, dest);
+
+      if (sizeof(DEFAULT_ROUTE) > sizeof(packet.src_addr)){
+        printf("Lack of space: size of DEFAULT_ROUTE > size of src_addr\n");
+        close(tun_fd);
+        close(sock_fd);
+        exit(EXIT_FAILURE);
+      }
+      strncpy(packet.src_addr, DEFAULT_ROUTE, sizeof(DEFAULT_ROUTE));
+
+      if (sizeof(DEFAULT_ROUTE) > sizeof(packet.dest_addr)){
+        printf("Lack of space for copy size of DEFAULT_ROUTE > size of dest_addr\n");
+        close(tun_fd);
+        close(sock_fd);
+        exit(EXIT_FAILURE);
+      }
+      strncpy(packet.dest_addr, dest, sizeof(DEFAULT_ROUTE));
+
       if(server) {
         set_reply_type(&packet);
       }
@@ -214,7 +240,7 @@ void run_tunnel(char *dest, int server)
       tun_write(tun_fd, packet.payload, packet.payload_size);
 
       printf("[DEBUG] Src address being copied: %s\n", packet.src_addr);
-      strcpy(dest, packet.src_addr);
+      strncpy(dest, packet.src_addr, strlen(packet.src_addr) + 1);
     }
   }
 
