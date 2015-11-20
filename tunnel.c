@@ -182,7 +182,12 @@ void run_tunnel(char *dest, int server)
       else {
         set_echo_type(&packet);
       }
-      packet.payload = malloc(MTU);
+      packet.payload = calloc(MTU, sizeof(uint8_t));
+      if (packet.payload == NULL){
+        perror("No memory available\n");
+        exit(EXIT_FAILURE);
+      }
+
       packet.payload_size  = tun_read(tun_fd, packet.payload, MTU);
       if(packet.payload_size  == -1) {
         printf("Error while reading from tun device\n");
