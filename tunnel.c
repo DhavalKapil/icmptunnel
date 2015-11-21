@@ -14,11 +14,13 @@
 #include <linux/if_tun.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
+#include <sys/wait.h>
 #include <fcntl.h>
 #include <netdb.h>
 #include <pwd.h>
 #include <pthread.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
 /**
  * Function to allocate a tunnel
@@ -28,13 +30,13 @@ int tun_alloc(char *dev, int flags)
   struct ifreq ifr;
   int tun_fd, err;
   char *clonedev = "/dev/net/tun";
-  printf("[DEBUG] Allocatating tunnel\n");
+  printf("[DEBUG] Allocating tunnel\n");
 
   tun_fd = open(clonedev, O_RDWR);
 
   if(tun_fd == -1) {
     perror("Unable to open clone device\n");
-    exit(-1);
+    exit(EXIT_FAILURE);
   }
   
   memset(&ifr, 0, sizeof(ifr));
@@ -47,8 +49,9 @@ int tun_alloc(char *dev, int flags)
 
   if ((err=ioctl(tun_fd, TUNSETIFF, (void *)&ifr)) < 0) {
     close(tun_fd);
-    printf("Error: %d\n", err);
-    exit(-1);
+    fprintf(stderr, "Error returned by ioctl(): %s\n", strerror(err));
+    perror("Error in tun_alloc()\n");
+    exit(EXIT_FAILURE);
   }
 
   printf("[DEBUG] Allocatating tunnel2");
@@ -69,7 +72,7 @@ int tun_read(int tun_fd, char *buffer, int length)
 
   if (bytes_read == -1) {
     perror("Unable to read from tunnel\n");
-    exit(-1);
+    exit(EXIT_FAILURE);
   }
   else {
     return bytes_read;
@@ -87,7 +90,7 @@ int tun_write(int tun_fd, char *buffer, int length)
 
   if (bytes_written == -1) {
     perror("Unable to write to tunnel\n");
-    exit(-1);
+    exit(EXIT_FAILURE);
   }
   else {
     return bytes_written;
@@ -114,7 +117,7 @@ void configure_network(int server)
 
   if (pid == -1) {
     perror("Unable to fork\n");
-    exit(-1);
+    exit(EXIT_FAILURE);
   }
   
   if (pid==0) {
@@ -185,8 +188,8 @@ void run_tunnel(char *dest, int server)
       packet.payload = malloc(MTU);
       packet.payload_size  = tun_read(tun_fd, packet.payload, MTU);
       if(packet.payload_size  == -1) {
-        printf("Error while reading from tun device\n");
-        exit(-1);
+        perror("Error while reading from tun device\n");
+        exit(EXIT_FAILURE);
       }
 
       printf("[DEBUG] Sending ICMP packet with payload_size: %d, payload: %s\n", packet.payload_size, packet.payload);
