@@ -192,15 +192,15 @@ void run_tunnel(char *dest, int server)
         close(sock_fd);
         exit(EXIT_FAILURE);
       }
-      strncpy(packet.src_addr, DEFAULT_ROUTE, sizeof(DEFAULT_ROUTE));
+      strncpy(packet.src_addr, DEFAULT_ROUTE, strlen(DEFAULT_ROUTE) + 1);
 
-      if (sizeof(DEFAULT_ROUTE) > sizeof(packet.dest_addr)){
+      if ((strlen(dest) + 1) > sizeof(packet.dest_addr)){
         printf("Lack of space for copy size of DEFAULT_ROUTE > size of dest_addr\n");
         close(tun_fd);
         close(sock_fd);
         exit(EXIT_FAILURE);
       }
-      strncpy(packet.dest_addr, dest, sizeof(DEFAULT_ROUTE));
+      strncpy(packet.dest_addr, dest, strlen(dest) + 1);
 
       if(server) {
         set_reply_type(&packet);
