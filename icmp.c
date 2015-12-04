@@ -102,13 +102,12 @@ void send_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
   inet_pton(AF_INET, packet_details->dest_addr, &dest_addr);
 
   packet_size = sizeof(struct iphdr) + sizeof(struct icmphdr) + packet_details->payload_size;
-  packet = (char *)malloc(packet_size);
+  packet = calloc(packet_size, sizeof(uint8_t));
   if (packet == NULL) {
     perror("No memory available\n");
     close_icmp_socket(sock_fd);
     exit(EXIT_FAILURE);
   }
-  memset(packet, 0, packet_size);
 
   // Initializing header and payload pointers
   ip = (struct iphdr *)packet;
@@ -154,8 +153,12 @@ void receive_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
 
   int src_addr_size;
 
-  packet = (char *)malloc(MTU);
-  memset(packet, 0, MTU);
+  packet = calloc(MTU, sizeof(uint8_t));
+  if (packet == NULL) {
+    perror("No memory available\n");
+    close_icmp_socket(sock_fd);
+    exit(-1);
+  }
 
   src_addr_size = sizeof(struct sockaddr_in);
   
@@ -171,7 +174,13 @@ void receive_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
   inet_ntop(AF_INET, &(ip->daddr), packet_details->dest_addr, INET_ADDRSTRLEN);
   packet_details->type = icmp->type;
   packet_details->payload_size = packet_size - sizeof(struct iphdr) - sizeof(struct icmphdr);
-  packet_details->payload = (char *)malloc(packet_details->payload_size);
+  packet_details->payload = calloc(packet_details->payload_size, sizeof(uint8_t));
+  if (packet_details->payload == NULL) {
+    perror("No memory available\n");
+    close_icmp_socket(sock_fd);
+    exit(-1);
+  }
+
   memcpy(packet_details->payload, icmp_payload, packet_details->payload_size);
 
   free(packet);
