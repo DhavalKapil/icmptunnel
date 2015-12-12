@@ -74,7 +74,7 @@ The tunnel should run and your client machine should be able to access the inter
 
 icmptunnel works by creating a virtual tunnel interface(say `tun0`). All the user traffic on the client host is routed to `tun0`. icmptunnel listens on this interface for IP packets. These packets are encapsulated in an ICMP echo packet(i.e. the payload of the ICMP packet is nothing but the original IP packet). This newly generated ICMP packet is sent outside the client machine, to the proxy server, through the restricted internet connection.
 
-The proxy server receives these ICMP packets and decapsulates the original IP packet. This is retransmitted onto the Internet after implementing IP masquerading. Hence, the target believes that its the proxy server making the request. The target then responds back to the proxy server with an IP packet. This is again captured by icmptunnel, encapsulated in an ICMP reply packet and send back to the client. 
+The proxy server receives these ICMP packets and decapsulates the original IP packet. This is retransmitted onto the Internet after implementing IP masquerading. Hence, the target believes that it's the proxy server making the request. The target then responds back to the proxy server with an IP packet. This is again captured by icmptunnel, encapsulated in an ICMP reply packet and send back to the client. 
 
 On the client side, the IP packet is retrieved from the payload of the ICMP reply packet and injected in `tun0`. The user applications read from this virtual interface and hence get the proper IP packet.
 
