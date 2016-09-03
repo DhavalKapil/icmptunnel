@@ -2,8 +2,8 @@
  *  icmp.h
  */
  
-#ifndef icmp_gaurd
-#define icmp_gaurd
+#ifndef icmp_guard
+#define icmp_guard
 
 // Maximum transmission unit
 #define MTU 1500
