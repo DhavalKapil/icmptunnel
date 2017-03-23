@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Assigining an IP address and mask to 'tun0' interface
-ifconfig tun0 mtu 1500 up 10.0.1.1 netmask 255.255.255.0 
+ifconfig tun0 mtu 1472 up 10.0.1.1 netmask 255.255.255.0 
 
 # Preventing the kernel to reply to any ICMP pings
 echo 1 | dd of=/proc/sys/net/ipv4/icmp_echo_ignore_all
