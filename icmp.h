@@ -6,7 +6,7 @@
 #define icmp_guard
 
 // Maximum transmission unit
-#define MTU 1500
+#define MTU 1472
 
 struct icmp_packet
 {

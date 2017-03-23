@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-I.
+CFLAGS=-I. -O3 -Wall
 DEPS = icmp.h tunnel.h
 
 %.o: %.c $(DEPS)

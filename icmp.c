@@ -142,7 +142,7 @@ void send_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
 void receive_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
 {
   struct sockaddr_in src_addr;
-  struct sockaddr_in dest_addr;
+  //struct sockaddr_in dest_addr;
 
   struct iphdr *ip;
   struct icmphdr *icmp;
@@ -151,9 +151,12 @@ void receive_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
   int packet_size;
   char *packet;
 
-  int src_addr_size;
+  socklen_t src_addr_size;
+  int enc_MTU; //encapsulated MTU
 
-  packet = calloc(MTU, sizeof(uint8_t));
+  enc_MTU = MTU + sizeof(struct iphdr) + sizeof(struct icmphdr);
+
+  packet = calloc(enc_MTU, sizeof(uint8_t));
   if (packet == NULL) {
     perror("No memory available\n");
     close_icmp_socket(sock_fd);
@@ -163,7 +166,7 @@ void receive_icmp_packet(int sock_fd, struct icmp_packet *packet_details)
   src_addr_size = sizeof(struct sockaddr_in);
   
   // Receiving packet
-  packet_size = recvfrom(sock_fd, packet, MTU, 0, (struct sockaddr *)&(src_addr), &src_addr_size);
+  packet_size = recvfrom(sock_fd, packet, enc_MTU, 0, (struct sockaddr *)&(src_addr), &src_addr_size);
 
   ip = (struct iphdr *)packet;
   icmp = (struct icmphdr *)(packet + sizeof(struct iphdr));
