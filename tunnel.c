@@ -243,6 +243,7 @@ void run_tunnel(char *dest, int server)
 
       printf("[DEBUG] Src address being copied: %s\n", packet.src_addr);
       strncpy(dest, packet.src_addr, strlen(packet.src_addr) + 1);
+      free(packet.payload);
     }
   }
 
