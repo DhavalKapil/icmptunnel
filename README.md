@@ -70,6 +70,17 @@ _Note: Although icmptunnel has been successfully tested on Ubuntu 14.04 LTS, it 
 
 The tunnel should run and your client machine should be able to access the internet. All traffic will be tunneled through ICMP.
 
+8. To get back to normal. after close the tunnel,you need to change the route, 
+the simplest way is 
+   ```
+  [sudo] ifconfig dev down 
+  [sudo] ifconfig dev up
+  ```
+replace dev with the actual name of device,
+this will turn down the network and connect again,thus give you a fresh Routing table
+
+also you can do this manually, i'll suggest you to remember the output at 5. when you first run 'route -n'
+you can do this simply by 'route del' and 'route add'(you may wanna to look at client.sh or man this)
 ## Architecture
 
 icmptunnel works by creating a virtual tunnel interface(say `tun0`). All the user traffic on the client host is routed to `tun0`. icmptunnel listens on this interface for IP packets. These packets are encapsulated in an ICMP echo packet(i.e. the payload of the ICMP packet is nothing but the original IP packet). This newly generated ICMP packet is sent outside the client machine, to the proxy server, through the restricted internet connection.
